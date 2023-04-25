@@ -9,3 +9,21 @@
     width: 400px;
   }
 }
+
+.play-button {
+  display: none;
+}
+
+.iui-cell:hover .play-button{
+  display: block;
+  cursor: pointer !important;
+}
+
+.iui-selected .play-button {
+  display: block;
+  cursor: pointer !important;
+}
+
+.loading {
+  cursor :progress
+}
