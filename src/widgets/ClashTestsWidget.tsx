@@ -95,17 +95,6 @@ const ClashTestsWidget = () => {
 				return updatedTests;
 			});
 			const response = await ClashReviewApi.createTestRun(process.env.IMJS_IMODEL_ID!, testId);
-			setNewRunRequested(false);
-			setClashTests((clashTests) => {
-				const updatedTests = clashTests.map((test) => {
-					if (test.id === testId) {
-						test.newRunRequested = true;
-						return test;
-					}
-					return test;
-				});
-				return updatedTests;
-			});
 			setRuns((runs) => {
 				const updatedRuns = runs.map((run: any) => {
 					if (run.id === response.id) {

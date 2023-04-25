@@ -103,7 +103,8 @@ export default class ClashReviewApi {
 
 			ClashReviewApi.onResultStatusChanged.raiseEvent(
 				ClashReviewApi._clashTestRuns[testId],
-				[1, 2, 7, 9].includes(structuredResultData.job_status)
+				[1, 2, 7, 9].includes(structuredResultData.job_status),
+				testId
 			);
 		}, 5000);
 	}

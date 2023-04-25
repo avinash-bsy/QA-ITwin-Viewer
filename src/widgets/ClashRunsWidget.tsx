@@ -15,7 +15,7 @@ interface TableRow extends Record<string, string> {
 }
 
 const ClashRunsWidget = () => {
-	const { runs, setClashResults, runsLoading, setResultsLoading, setRuns, setNewRunRequested } = useClashContext();
+	const { runs, setClashResults, runsLoading, setResultsLoading, setRuns, setNewRunRequested, setClashTests } = useClashContext();
 
 	const getJobStatusText = useCallback((jobStatus: string) => {
 		const statusMap: { [id: string]: any } = {
@@ -85,11 +85,21 @@ const ClashRunsWidget = () => {
 	};
 
 	useEffect(() => {
-		const removeListener = ClashReviewApi.onResultStatusChanged.addListener((clashTestRuns: any, exitCode: boolean) => {
+		const removeListener = ClashReviewApi.onResultStatusChanged.addListener((clashTestRuns: any, exitCode: boolean, testId: string) => {
 			setRuns((runs) => {
 				return [...clashTestRuns];
 			});
 			if (exitCode) {
+				setClashTests((clashTests) => {
+					const updatedTests = clashTests.map((test) => {
+						if (test.id === testId) {
+							test.newRunRequested = false;
+							return test;
+						}
+						return test;
+					});
+					return updatedTests;
+				});
 				setNewRunRequested(false);
 			}
 		});
