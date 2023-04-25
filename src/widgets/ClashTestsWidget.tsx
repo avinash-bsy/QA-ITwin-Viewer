@@ -32,10 +32,13 @@ const ClashTestsWidget = () => {
 						cellRenderer: (props: any) => (
 							<DefaultCell {...props} style={{ display: "flex", justifyContent: "space-between" }}>
 								{props.cellProps.row.original.name}
-								{newRunRequested ? (
+								{props.cellProps.row.original.newRunRequested ? (
 									<button disabled={true}>Loading</button>
 								) : (
-									<button className="play-button" onClick={(e) => handleRunCreation(e, props.cellProps.row.original.id)}>
+									<button
+										className="play-button"
+										disabled={newRunRequested}
+										onClick={(e) => handleRunCreation(e, props.cellProps.row.original.id)}>
 										Run
 									</button>
 								)}
@@ -81,9 +84,30 @@ const ClashTestsWidget = () => {
 	const handleRunCreation = async (event: React.MouseEvent, testId: string) => {
 		try {
 			setNewRunRequested(true);
+			setClashTests((clashTests) => {
+				const updatedTests = clashTests.map((test) => {
+					if (test.id === testId) {
+						test.newRunRequested = true;
+						return test;
+					}
+					return test;
+				});
+				return updatedTests;
+			});
 			const response = await ClashReviewApi.createTestRun(process.env.IMJS_IMODEL_ID!, testId);
+			setNewRunRequested(false);
+			setClashTests((clashTests) => {
+				const updatedTests = clashTests.map((test) => {
+					if (test.id === testId) {
+						test.newRunRequested = true;
+						return test;
+					}
+					return test;
+				});
+				return updatedTests;
+			});
 			setRuns((runs) => {
-				let updatedRuns = runs.map((run: any) => {
+				const updatedRuns = runs.map((run: any) => {
 					if (run.id === response.id) {
 						return response;
 					}
