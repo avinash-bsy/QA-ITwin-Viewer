@@ -172,12 +172,18 @@ export default class ClashReviewApi {
 			});
 
 			const data = await response.json();
+
+			const categoryListMap: { [id: string]: string } = {};
+			data.result.categoryList.map((category: any) => {
+				categoryListMap[category.id] = category.label;
+			});
+
 			ClashReviewApi._clashResults[resultId] = data.result.clashes.map((clash: any) => {
 				return {
 					elementALabel: clash.elementALabel,
 					elementAId: clash.elementAId,
-					elementACategory: clash.elementACategoryId,
-					elementBLabel: clash.elementBLabel,
+					elementACategory: categoryListMap[clash.elementACategoryId],
+					elementBLabel: categoryListMap[clash.elementBLabel],
 					elementBId: clash.elementBId,
 					elementBCategory: clash.elementBCategoryId,
 					clashType: clash.clashType,
