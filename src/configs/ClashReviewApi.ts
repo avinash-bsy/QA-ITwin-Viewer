@@ -183,9 +183,9 @@ export default class ClashReviewApi {
 					elementALabel: clash.elementALabel,
 					elementAId: clash.elementAId,
 					elementACategory: categoryListMap[clash.elementACategoryId],
-					elementBLabel: categoryListMap[clash.elementBLabel],
+					elementBLabel: clash.elementBLabel,
 					elementBId: clash.elementBId,
-					elementBCategory: clash.elementBCategoryId,
+					elementBCategory: categoryListMap[clash.elementBCategoryId],
 					clashType: clash.clashType,
 					status: clash.status,
 				};
