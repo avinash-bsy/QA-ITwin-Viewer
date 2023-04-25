@@ -83,7 +83,14 @@ const ClashTestsWidget = () => {
 			setNewRunRequested(true);
 			const response = await ClashReviewApi.createTestRun(process.env.IMJS_IMODEL_ID!, testId);
 			setRuns((runs) => {
-				return [...runs, response];
+				let updatedRuns = runs.map((run: any) => {
+					if (run.id === response.id) {
+						return response;
+					}
+					return run;
+				});
+
+				return updatedRuns;
 			});
 		} catch (error) {
 			console.log(error);
