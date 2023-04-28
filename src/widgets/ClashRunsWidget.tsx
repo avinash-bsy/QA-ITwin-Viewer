@@ -2,8 +2,8 @@
  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
-import { useCallback, useEffect, useMemo } from "react";
-import { actions } from "react-table";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { actions, ActionType, MetaBase, TableState } from "react-table";
 import { AbstractWidgetProps, StagePanelLocation, StagePanelSection, UiItemsProvider, WidgetState } from "@itwin/appui-abstract";
 import { Table, DefaultCell } from "@itwin/itwinui-react";
 import { useClashContext } from "../context/ClashContext";
@@ -15,7 +15,9 @@ interface TableRow extends Record<string, string> {
 }
 
 const ClashRunsWidget = () => {
-	const { runs, setClashResults, runsLoading, setResultsLoading, setRuns, setNewRunRequested, setClashTests } = useClashContext();
+	const [isAutoSelect, setIsAutoSelect] = useState<boolean>(false);
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const { runs, setRuns, setNewRunRequested, setClashResults, runId, testId, setRunId } = useClashContext();
 
 	const getJobStatusText = useCallback((jobStatus: string) => {
 		const statusMap: { [id: string]: any } = {
@@ -63,12 +65,9 @@ const ClashRunsWidget = () => {
 
 	const onRowClick = useCallback(
 		async (_: any, row: any) => {
-			setResultsLoading(true);
-			setClashResults([]);
-			const clashResults = await ClashReviewApi.getClashResults(process.env.IMJS_CONTEXT_ID!, row.original.id);
-			setClashResults(clashResults);
+			setIsAutoSelect(false);
 			row.toggleRowSelected(true);
-			setResultsLoading(false);
+			setRunId(row.original.id);
 		},
 		[runs]
 	);
@@ -84,37 +83,62 @@ const ClashRunsWidget = () => {
 		return newState;
 	};
 
-	useEffect(() => {
-		const removeListener = ClashReviewApi.onResultStatusChanged.addListener((clashTestRuns: any, exitCode: boolean, testId: string) => {
-			setRuns((runs) => {
-				return [...clashTestRuns];
-			});
-			if (exitCode) {
-				setClashTests((clashTests) => {
-					const updatedTests = clashTests.map((test) => {
-						if (test.id === testId) {
-							test.newRunRequested = false;
-							return test;
-						}
-						return test;
-					});
-					return updatedTests;
-				});
-				setNewRunRequested(false);
+	const controlledState = useCallback(
+		(state: TableState<TableRow>, meta: MetaBase<TableRow>) => {
+			if (isAutoSelect && meta.instance.rows && meta.instance.rows.length) {
+				const row = meta.instance.rows[0];
+				state.selectedRowIds = {};
+				state.selectedRowIds[row.id] = true;
+				setRunId(row.original.id);
 			}
-		});
+			return { ...state };
+		},
+		[isAutoSelect]
+	);
+
+	const getClashRuns = async () => {
+		setIsLoading(true);
+		const clashRuns = await ClashReviewApi.getClashRuns(process.env.IMJS_ITWIN_ID!, testId);
+		setRuns(clashRuns);
+		setIsLoading(false);
+	};
+
+	useEffect(() => {
+		const removeListener = ClashReviewApi.onResultStatusChanged.addListener(
+			(clashTestRuns: any, exitCode: boolean, selectedRunId: string, clashResultData: any) => {
+				setRuns((runs) => {
+					return [...clashTestRuns];
+				});
+
+				if (runId === selectedRunId) {
+					setClashResults([...clashResultData]);
+				}
+
+				if (exitCode) {
+					setNewRunRequested(null);
+				}
+			}
+		);
 
 		return () => {
 			removeListener();
 		};
-	}, []);
+	}, [runId]);
+
+	useEffect(() => {
+		if (testId) {
+			setIsAutoSelect(true);
+			getClashRuns();
+		}
+	}, [testId]);
 
 	return (
 		<Table<TableRow>
 			data={runs}
 			columns={columnDefinition}
 			onRowClick={onRowClick}
-			isLoading={Boolean(runs) && runsLoading}
+			isLoading={isLoading}
+			useControlledState={controlledState}
 			stateReducer={tableStateSingleSelectReducer}
 			emptyTableContent={"No runs"}
 			density="extra-condensed"

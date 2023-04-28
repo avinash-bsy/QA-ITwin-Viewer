@@ -6,75 +6,9 @@ import { BeEvent } from "@itwin/core-bentley";
 import { ColorDef, FeatureOverrideType } from "@itwin/core-common";
 import { EmphasizeElements, IModelApp, ViewChangeOptions } from "@itwin/core-frontend";
 
-export default class ClashReviewApi {
-	public static onResultStatusChanged = new BeEvent<any>();
-	private static _clashTests: { [id: string]: any } = {};
-	private static _clashTestRuns: { [id: string]: any } = {};
-	private static _clashRuns: { [id: string]: any } = {};
-	private static _clashResults: { [id: string]: any } = {};
-	private static _RMS_BASE_URL: string = "https://qa-connect-designvalidationrulemanagement.bentley.com/v3";
-	private static _RAS_BASE_URL: string = "https://qa-connect-resultsanalysisservice.bentley.com/v2";
-	private static _accessToken: string = "";
-	private static _changesetId: string = "";
-
-	public static setAccessToken(accessToken: string): void {
-		ClashReviewApi._accessToken = accessToken;
-	}
-
-	public static async createTestRun(projectId: string, testId: string): Promise<any> {
-		if (ClashReviewApi._changesetId === "") {
-			if (process.env.USE_LATEST_CHANGESET) {
-				ClashReviewApi._changesetId = await ClashReviewApi.getLatestChangeSetIdForIModel(projectId);
-			} else {
-				ClashReviewApi._changesetId = process.env.IMJS_CHANGESET_ID!;
-			}
-		}
-
-		const data = [
-			{
-				iModelId: projectId,
-				changesetId: ClashReviewApi._changesetId,
-				configurationId: testId,
-				testSettings: {
-					resultsLimit: 100,
-				},
-			},
-		];
-
-		const response = await fetch(`${ClashReviewApi._RMS_BASE_URL}/contexts/${process.env.IMJS_CONTEXT_ID}/tests/run`, {
-			method: "POST",
-			headers: {
-				accept: "application/json",
-				Authorization: ClashReviewApi._accessToken,
-				"Content-Type": "application/json",
-				"In-Place": "force",
-			},
-			body: JSON.stringify(data),
-		});
-
-		const responseData = await response.json();
-
-		const resultId = responseData.status[0].resultId;
-
-		const newResultData = await ClashReviewApi.getResultDetails(resultId);
-
-		ClashReviewApi.checkResultStatus(resultId, testId);
-
-		return newResultData;
-	}
-
-	private static async getResultDetails(resultId: string) {
-		const resultData = await fetch(`${ClashReviewApi._RAS_BASE_URL}/results/${resultId}`, {
-			headers: {
-				accept: "application/json",
-				context: process.env.IMJS_CONTEXT_ID!,
-				Authorization: ClashReviewApi._accessToken,
-			},
-		});
-
-		const rowData = await resultData.json();
-
-		const clash = rowData.resultMetadata;
+class HelperMethods {
+	public static structureDataForRunWidget(data: any) {
+		const clash = data.resultMetadata;
 		const structuredResultData = {
 			id: clash.id,
 			execution_time: new Date(clash.executed).toLocaleString(),
@@ -85,26 +19,94 @@ export default class ClashReviewApi {
 		return structuredResultData;
 	}
 
-	private static checkResultStatus(resultId: string, testId: string): void {
+	public static structureDataForResultWidget(data: any) {
+		const categoryListMap: { [id: string]: string } = {};
+		data.result.categoryList.map((category: any) => {
+			categoryListMap[category.id] = category.label;
+		});
+
+		const structuredResultData = data.result.clashes.map((clash: any) => {
+			return {
+				elementALabel: clash.elementALabel,
+				elementAId: clash.elementAId,
+				elementACategory: categoryListMap[clash.elementACategoryId],
+				elementBLabel: clash.elementBLabel,
+				elementBId: clash.elementBId,
+				elementBCategory: categoryListMap[clash.elementBCategoryId],
+				clashType: clash.clashType,
+				status: clash.status,
+			};
+		});
+
+		return structuredResultData;
+	}
+}
+
+export default class ClashReviewApi extends HelperMethods {
+	private static _clashTests: { [id: string]: any } = {}; // List of all clash tests
+	private static _clashTestRuns: { [id: string]: any } = {}; // List of all runs for a test
+	private static _clashRuns: { [id: string]: any } = {}; // List of all runs for a project
+	private static _clashResults: { [id: string]: any } = {}; // List of clash results for a run
+	private static _RMS_BASE_URL: string = "https://qa-connect-designvalidationrulemanagement.bentley.com/v3"; // QA - RMS Endpoint
+	private static _RAS_BASE_URL: string = "https://qa-connect-resultsanalysisservice.bentley.com/v2"; // QA - RAS Endpoint
+	private static _accessToken: string = ""; // JWT Token - Bearer keyword inclusive
+	private static _changesetId: string = "";
+	public static onResultStatusChanged = new BeEvent<any>();
+
+	public static setAccessToken(accessToken: string): void {
+		ClashReviewApi._accessToken = accessToken;
+	}
+
+	private static async getLatestChangeSetIdForIModel(iModelId: string) {
+		const response = await fetch(`https://qa-api.bentley.com/imodels/${iModelId}/changesets?$top=1&$orderBy=index desc`, {
+			headers: {
+				Accept: "application/vnd.bentley.itwin-platform.v2+json",
+				Prefer: "return=minimal",
+				Authorization: ClashReviewApi._accessToken,
+			},
+		});
+
+		const changeSetData = await response.json();
+		return changeSetData.changeSets[0]?.id;
+	}
+
+	private static async getResultDetailsById(resultId: string) {
+		const resultData = await fetch(`${ClashReviewApi._RAS_BASE_URL}/results/${resultId}`, {
+			headers: {
+				accept: "application/json",
+				context: process.env.IMJS_CONTEXT_ID!,
+				Authorization: ClashReviewApi._accessToken,
+			},
+		});
+
+		const rowData = await resultData.json();
+		return rowData;
+	}
+
+	private static pollForResultStatusChange(resultId: string, testId: string): void {
 		const timer = setInterval(async () => {
-			const structuredResultData = await ClashReviewApi.getResultDetails(resultId);
+			const resultData = await ClashReviewApi.getResultDetailsById(resultId);
+			const structuredRunData = ClashReviewApi.structureDataForRunWidget(resultData);
+			const structuredResultData = ClashReviewApi.structureDataForResultWidget(resultData);
 
-			const index = ClashReviewApi._clashTestRuns[testId].findIndex((elem: any) => elem.id === structuredResultData.id);
-
+			const index = ClashReviewApi._clashTestRuns[testId].findIndex((elem: any) => elem.id === structuredRunData.id);
 			if (index != -1) {
-				ClashReviewApi._clashTestRuns[testId][index] = structuredResultData;
+				ClashReviewApi._clashTestRuns[testId][index] = structuredRunData;
 			} else {
-				ClashReviewApi._clashTestRuns[testId].push(structuredResultData);
+				ClashReviewApi._clashTestRuns[testId].push(structuredRunData);
 			}
 
-			if ([1, 2, 7, 9].includes(structuredResultData.job_status)) {
+			ClashReviewApi._clashResults[resultId] = structuredResultData;
+
+			if ([1, 2, 7, 9].includes(structuredRunData.job_status)) {
 				clearInterval(timer);
 			}
 
 			ClashReviewApi.onResultStatusChanged.raiseEvent(
 				ClashReviewApi._clashTestRuns[testId],
-				[1, 2, 7, 9].includes(structuredResultData.job_status),
-				testId
+				[1, 2, 7, 9].includes(structuredRunData.job_status),
+				resultId,
+				ClashReviewApi._clashResults[resultId]
 			);
 		}, 5000);
 	}
@@ -161,51 +163,55 @@ export default class ClashReviewApi {
 		return ClashReviewApi._clashTestRuns[testId];
 	}
 
-	public static async getClashResults(projectId: string, resultId: string): Promise<any> {
+	public static async getClashResults(resultId: string): Promise<any> {
 		if (ClashReviewApi._clashResults[resultId] === undefined) {
-			const response = await fetch(`${ClashReviewApi._RAS_BASE_URL}/results/${resultId}`, {
-				headers: {
-					accept: "application/json",
-					context: projectId,
-					Authorization: ClashReviewApi._accessToken,
-				},
-			});
-
-			const data = await response.json();
-
-			const categoryListMap: { [id: string]: string } = {};
-			data.result.categoryList.map((category: any) => {
-				categoryListMap[category.id] = category.label;
-			});
-
-			ClashReviewApi._clashResults[resultId] = data.result.clashes.map((clash: any) => {
-				return {
-					elementALabel: clash.elementALabel,
-					elementAId: clash.elementAId,
-					elementACategory: categoryListMap[clash.elementACategoryId],
-					elementBLabel: clash.elementBLabel,
-					elementBId: clash.elementBId,
-					elementBCategory: categoryListMap[clash.elementBCategoryId],
-					clashType: clash.clashType,
-					status: clash.status,
-				};
-			});
+			const resultData = await ClashReviewApi.getResultDetailsById(resultId);
+			ClashReviewApi._clashResults[resultId] = ClashReviewApi.structureDataForResultWidget(resultData);
 		}
 
 		return ClashReviewApi._clashResults[resultId];
 	}
 
-	private static async getLatestChangeSetIdForIModel(iModelId: string) {
-		const response = await fetch(`https://qa-api.bentley.com/imodels/${iModelId}/changesets?$top=1&$orderBy=index desc`, {
-			headers: {
-				Accept: "application/vnd.bentley.itwin-platform.v2+json",
-				Prefer: "return=minimal",
-				Authorization: ClashReviewApi._accessToken,
+	public static async submitTestRunRequest(projectId: string, testId: string): Promise<any> {
+		if (ClashReviewApi._changesetId === "") {
+			if (process.env.USE_LATEST_CHANGESET) {
+				ClashReviewApi._changesetId = await ClashReviewApi.getLatestChangeSetIdForIModel(projectId);
+			} else {
+				ClashReviewApi._changesetId = process.env.IMJS_CHANGESET_ID!;
+			}
+		}
+
+		const data = [
+			{
+				iModelId: projectId,
+				changesetId: ClashReviewApi._changesetId,
+				configurationId: testId,
+				testSettings: {
+					resultsLimit: 100,
+				},
 			},
+		];
+
+		const response = await fetch(`${ClashReviewApi._RMS_BASE_URL}/contexts/${process.env.IMJS_CONTEXT_ID}/tests/run`, {
+			method: "POST",
+			headers: {
+				accept: "application/json",
+				Authorization: ClashReviewApi._accessToken,
+				"Content-Type": "application/json",
+				"In-Place": "force",
+			},
+			body: JSON.stringify(data),
 		});
 
-		const changeSetData = await response.json();
-		return changeSetData.changeSets[0]?.id;
+		const responseData = await response.json();
+
+		const resultId = responseData.status[0].resultId;
+
+		const resultData = await ClashReviewApi.getResultDetailsById(resultId);
+		const structuredRunData = ClashReviewApi.structureDataForRunWidget(resultData);
+		ClashReviewApi.pollForResultStatusChange(resultId, testId);
+
+		return structuredRunData;
 	}
 
 	public static visualizeClash(elementAId: string, elementBId: string, isMarkerClick: boolean) {

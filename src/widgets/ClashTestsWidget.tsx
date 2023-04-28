@@ -2,8 +2,8 @@
  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
-import { useEffect, useMemo } from "react";
-import { actions, ActionType } from "react-table";
+import { useEffect, useMemo, useState, useCallback } from "react";
+import { actions, ActionType, MetaBase, TableState } from "react-table";
 import { AbstractWidgetProps, StagePanelLocation, StagePanelSection, UiItemsProvider, WidgetState } from "@itwin/appui-abstract";
 import { useActiveIModelConnection } from "@itwin/appui-react";
 import { Table, DefaultCell } from "@itwin/itwinui-react";
@@ -17,8 +17,9 @@ interface TableRow extends Record<string, string> {
 
 const ClashTestsWidget = () => {
 	const iModelConnection = useActiveIModelConnection();
-	const { clashTests, testsLoading, newRunRequested, setClashTests, setRuns, setTestsLoading, setRunsLoading, setNewRunRequested } =
-		useClashContext();
+	const [isAutoSelect, setIsAutoSelect] = useState<boolean>(false);
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const { clashTests, newRunRequested, setClashTests, setNewRunRequested, setTestId, setRuns } = useClashContext();
 
 	const columnDefinition = useMemo(() => {
 		return [
@@ -32,12 +33,12 @@ const ClashTestsWidget = () => {
 						cellRenderer: (props: any) => (
 							<DefaultCell {...props} style={{ display: "flex", justifyContent: "space-between" }}>
 								{props.cellProps.row.original.name}
-								{props.cellProps.row.original.newRunRequested ? (
+								{props.cellProps.row.original.id === newRunRequested ? (
 									<button disabled={true}>Loading</button>
 								) : (
 									<button
 										className="play-button"
-										disabled={newRunRequested}
+										disabled={newRunRequested !== null}
 										onClick={(e) => handleRunCreation(e, props.cellProps.row.original.id)}>
 										Run
 									</button>
@@ -48,7 +49,7 @@ const ClashTestsWidget = () => {
 				],
 			},
 		];
-	}, [clashTests, newRunRequested]);
+	}, [newRunRequested]);
 
 	const tableStateSingleSelectReducer = (newState: any, action: ActionType): any => {
 		switch (action.type) {
@@ -63,38 +64,40 @@ const ClashTestsWidget = () => {
 
 	const getClashTests = async (iTwinId: string) => {
 		try {
+			setIsLoading(true);
 			const data = await ClashReviewApi.getClashTests(iTwinId!);
 			setClashTests(data.rows);
-			setTestsLoading(false);
+			setIsLoading(false);
 		} catch (error) {
 			console.log(error);
 		}
 	};
 
+	const controlledState = useCallback(
+		(state: TableState<TableRow>, meta: MetaBase<TableRow>) => {
+			if (isAutoSelect && meta.instance.rows && meta.instance.rows.length) {
+				const row = meta.instance.rows[0];
+				state.selectedRowIds = {};
+				state.selectedRowIds[row.id] = true;
+				setTestId(row.original.id);
+			}
+			return { ...state };
+		},
+		[isAutoSelect]
+	);
+
 	const onRowClick = async (_: any, row: any) => {
 		if (iModelConnection) {
-			setRunsLoading(true);
+			setIsAutoSelect(false);
 			row.toggleRowSelected(true);
-			const runs = await ClashReviewApi.getClashRuns(iModelConnection.iTwinId!, row.original.id);
-			setRuns(runs);
-			setRunsLoading(false);
+			setTestId(row.original.id);
 		}
 	};
 
 	const handleRunCreation = async (event: React.MouseEvent, testId: string) => {
 		try {
-			setNewRunRequested(true);
-			setClashTests((clashTests) => {
-				const updatedTests = clashTests.map((test) => {
-					if (test.id === testId) {
-						test.newRunRequested = true;
-						return test;
-					}
-					return test;
-				});
-				return updatedTests;
-			});
-			const response = await ClashReviewApi.createTestRun(process.env.IMJS_IMODEL_ID!, testId);
+			setNewRunRequested(testId);
+			const response = await ClashReviewApi.submitTestRunRequest(process.env.IMJS_IMODEL_ID!, testId);
 			setRuns((runs) => {
 				const updatedRuns = runs.map((run: any) => {
 					if (run.id === response.id) {
@@ -112,6 +115,7 @@ const ClashTestsWidget = () => {
 
 	useEffect(() => {
 		if (iModelConnection) {
+			setIsAutoSelect(true);
 			getClashTests(iModelConnection.iTwinId!);
 		}
 	}, [iModelConnection]);
@@ -120,8 +124,9 @@ const ClashTestsWidget = () => {
 		<Table<TableRow>
 			data={clashTests}
 			columns={columnDefinition}
-			isLoading={testsLoading}
+			isLoading={isLoading}
 			isSortable
+			useControlledState={controlledState}
 			onRowClick={onRowClick}
 			stateReducer={tableStateSingleSelectReducer}
 			emptyTableContent={"No tests"}

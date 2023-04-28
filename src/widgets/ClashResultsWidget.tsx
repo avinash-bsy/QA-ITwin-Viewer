@@ -2,7 +2,7 @@
  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { actions, ActionType, TableState } from "react-table";
 import { AbstractWidgetProps, StagePanelLocation, StagePanelSection, UiItemsProvider, WidgetState } from "@itwin/appui-abstract";
 import { DefaultCell, Table } from "@itwin/itwinui-react";
@@ -24,7 +24,8 @@ export interface ElementPair {
 }
 
 const ClashResultsWidget = () => {
-	const { clashResults, resultsLoading } = useClashContext();
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const { clashResults, runId, setClashResults } = useClashContext();
 
 	const columnDefinition = useMemo(
 		() => [
@@ -103,6 +104,19 @@ const ClashResultsWidget = () => {
 		[clashResults]
 	);
 
+	const getClashResults = async () => {
+		setIsLoading(true);
+		const clashResults = await ClashReviewApi.getClashResults(runId);
+		setClashResults(clashResults);
+		setIsLoading(false);
+	};
+
+	useEffect(() => {
+		if (runId) {
+			getClashResults();
+		}
+	}, [runId]);
+
 	useEffect(() => {
 		if (!clashResults.length) {
 			ClashReviewApi.resetDisplay();
@@ -116,7 +130,7 @@ const ClashResultsWidget = () => {
 			onRowClick={onRowClick}
 			isSortable
 			stateReducer={tableStateReducer}
-			isLoading={resultsLoading}
+			isLoading={isLoading}
 			emptyTableContent={"No results"}
 			density="extra-condensed"
 			style={{ height: "100%" }}

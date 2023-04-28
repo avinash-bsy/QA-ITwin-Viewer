@@ -3,36 +3,32 @@ import React, { useContext, useState } from "react";
 interface ClashContextType {
 	clashTests: Array<any>;
 	runs: Array<any>;
-	accessToken: string;
 	clashResults: Array<any>;
-	testsLoading: boolean;
-	setTestsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-	runsLoading: boolean;
-	setRunsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-	resultsLoading: boolean;
-	newRunRequested: boolean;
-	setNewRunRequested: React.Dispatch<React.SetStateAction<boolean>>;
-	setResultsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-	setAccessToken: React.Dispatch<React.SetStateAction<string>>;
+	testId: string;
+	runId: string;
+	resultId: string;
+	newRunRequested: string | null;
+	setNewRunRequested: React.Dispatch<React.SetStateAction<string | null>>;
 	setClashTests: React.Dispatch<React.SetStateAction<Array<any>>>;
 	setRuns: React.Dispatch<React.SetStateAction<Array<any>>>;
 	setClashResults: React.Dispatch<React.SetStateAction<Array<any>>>;
+	setTestId: React.Dispatch<React.SetStateAction<string>>;
+	setResultId: React.Dispatch<React.SetStateAction<string>>;
+	setRunId: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const ClashContext = React.createContext<ClashContextType>({
 	clashTests: [],
 	runs: [],
 	clashResults: [],
-	accessToken: "",
-	testsLoading: true,
-	setTestsLoading: () => {},
-	runsLoading: true,
-	setRunsLoading: () => {},
-	resultsLoading: true,
-	newRunRequested: false,
+	testId: "",
+	runId: "",
+	resultId: "",
+	newRunRequested: null,
+	setTestId: () => {},
+	setRunId: () => {},
+	setResultId: () => {},
 	setNewRunRequested: () => {},
-	setResultsLoading: () => {},
-	setAccessToken: () => {},
 	setClashTests: () => {},
 	setRuns: () => {},
 	setClashResults: () => {},
@@ -42,29 +38,29 @@ const ClashContextProvider: React.FC = ({ children }) => {
 	const [clashTests, setClashTests] = useState<any[]>([]);
 	const [runs, setRuns] = useState<any[]>([]);
 	const [clashResults, setClashResults] = useState<any[]>([]);
-	const [accessToken, setAccessToken] = useState<string>("");
+	const [testId, setTestId] = useState<string>("");
+	const [runId, setRunId] = useState<string>("");
+	const [resultId, setResultId] = useState<string>("");
 	const [testsLoading, setTestsLoading] = useState<boolean>(true);
 	const [runsLoading, setRunsLoading] = useState<boolean>(false);
 	const [resultsLoading, setResultsLoading] = useState<boolean>(false);
-	const [newRunRequested, setNewRunRequested] = useState<boolean>(false);
+	const [newRunRequested, setNewRunRequested] = useState<string | null>(null);
 
 	const contextValues: ClashContextType = {
 		clashTests,
 		runs,
-		accessToken,
 		clashResults,
-		testsLoading,
-		setTestsLoading,
-		runsLoading,
-		setRunsLoading,
-		resultsLoading,
 		newRunRequested,
+		testId,
+		resultId,
+		runId,
 		setNewRunRequested,
-		setResultsLoading,
 		setClashTests,
 		setClashResults,
 		setRuns,
-		setAccessToken,
+		setTestId,
+		setRunId,
+		setResultId,
 	};
 
 	return <ClashContext.Provider value={contextValues}>{children}</ClashContext.Provider>;
