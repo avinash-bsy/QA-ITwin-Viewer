@@ -173,12 +173,10 @@ export default class ClashReviewApi extends HelperMethods {
 	}
 
 	public static async submitTestRunRequest(projectId: string, testId: string): Promise<any> {
-		if (ClashReviewApi._changesetId === "") {
-			if (process.env.USE_LATEST_CHANGESET) {
-				ClashReviewApi._changesetId = await ClashReviewApi.getLatestChangeSetIdForIModel(projectId);
-			} else {
-				ClashReviewApi._changesetId = process.env.IMJS_CHANGESET_ID!;
-			}
+		if (process.env.USE_LATEST_CHANGESET) {
+			ClashReviewApi._changesetId = await ClashReviewApi.getLatestChangeSetIdForIModel(projectId);
+		} else {
+			ClashReviewApi._changesetId = process.env.IMJS_CHANGESET_ID!;
 		}
 
 		const data = [
