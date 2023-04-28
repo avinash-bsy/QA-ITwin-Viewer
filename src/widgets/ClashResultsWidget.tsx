@@ -25,7 +25,7 @@ export interface ElementPair {
 
 const ClashResultsWidget = () => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
-	const { clashResults, runId, setClashResults } = useClashContext();
+	const { clashResults, runId, testId, setClashResults } = useClashContext();
 
 	const columnDefinition = useMemo(
 		() => [
@@ -114,14 +114,14 @@ const ClashResultsWidget = () => {
 	useEffect(() => {
 		if (runId) {
 			getClashResults();
+		} else {
+			setClashResults([]);
 		}
 	}, [runId]);
 
 	useEffect(() => {
-		if (!clashResults.length) {
-			ClashReviewApi.resetDisplay();
-		}
-	}, [clashResults]);
+		ClashReviewApi.resetDisplay();
+	}, [runId, testId]);
 
 	return (
 		<Table<TableRow>

@@ -17,7 +17,7 @@ interface TableRow extends Record<string, string> {
 
 const ClashTestsWidget = () => {
 	const iModelConnection = useActiveIModelConnection();
-	const [isAutoSelect, setIsAutoSelect] = useState<boolean>(false);
+	const [isAutoSelect, setIsAutoSelect] = useState<boolean>(true);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const { clashTests, newRunRequested, setClashTests, setNewRunRequested, setTestId, setRuns } = useClashContext();
 
@@ -66,25 +66,15 @@ const ClashTestsWidget = () => {
 		try {
 			setIsLoading(true);
 			const data = await ClashReviewApi.getClashTests(iTwinId!);
+			if (isAutoSelect) {
+				setTestId(data.rows[0]?.id);
+			}
 			setClashTests(data.rows);
 			setIsLoading(false);
 		} catch (error) {
 			console.log(error);
 		}
 	};
-
-	const controlledState = useCallback(
-		(state: TableState<TableRow>, meta: MetaBase<TableRow>) => {
-			if (isAutoSelect && meta.instance.rows && meta.instance.rows.length) {
-				const row = meta.instance.rows[0];
-				state.selectedRowIds = {};
-				state.selectedRowIds[row.id] = true;
-				setTestId(row.original.id);
-			}
-			return { ...state };
-		},
-		[isAutoSelect]
-	);
 
 	const onRowClick = async (_: any, row: any) => {
 		if (iModelConnection) {
@@ -115,7 +105,6 @@ const ClashTestsWidget = () => {
 
 	useEffect(() => {
 		if (iModelConnection) {
-			setIsAutoSelect(true);
 			getClashTests(iModelConnection.iTwinId!);
 		}
 	}, [iModelConnection]);
@@ -126,7 +115,11 @@ const ClashTestsWidget = () => {
 			columns={columnDefinition}
 			isLoading={isLoading}
 			isSortable
-			useControlledState={controlledState}
+			initialState={{
+				selectedRowIds: {
+					0: true,
+				},
+			}}
 			onRowClick={onRowClick}
 			stateReducer={tableStateSingleSelectReducer}
 			emptyTableContent={"No tests"}

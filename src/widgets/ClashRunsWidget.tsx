@@ -15,7 +15,7 @@ interface TableRow extends Record<string, string> {
 }
 
 const ClashRunsWidget = () => {
-	const [isAutoSelect, setIsAutoSelect] = useState<boolean>(false);
+	const [isAutoSelect, setIsAutoSelect] = useState<boolean>(true);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const { runs, setRuns, setNewRunRequested, setClashResults, runId, testId, setRunId } = useClashContext();
 
@@ -83,22 +83,12 @@ const ClashRunsWidget = () => {
 		return newState;
 	};
 
-	const controlledState = useCallback(
-		(state: TableState<TableRow>, meta: MetaBase<TableRow>) => {
-			if (isAutoSelect && meta.instance.rows && meta.instance.rows.length) {
-				const row = meta.instance.rows[0];
-				state.selectedRowIds = {};
-				state.selectedRowIds[row.id] = true;
-				setRunId(row.original.id);
-			}
-			return { ...state };
-		},
-		[isAutoSelect]
-	);
-
 	const getClashRuns = async () => {
 		setIsLoading(true);
 		const clashRuns = await ClashReviewApi.getClashRuns(process.env.IMJS_ITWIN_ID!, testId);
+		if (isAutoSelect) {
+			setRunId(clashRuns[0]?.id);
+		}
 		setRuns(clashRuns);
 		setIsLoading(false);
 	};
@@ -127,7 +117,6 @@ const ClashRunsWidget = () => {
 
 	useEffect(() => {
 		if (testId) {
-			setIsAutoSelect(true);
 			getClashRuns();
 		}
 	}, [testId]);
@@ -138,7 +127,11 @@ const ClashRunsWidget = () => {
 			columns={columnDefinition}
 			onRowClick={onRowClick}
 			isLoading={isLoading}
-			useControlledState={controlledState}
+			initialState={{
+				selectedRowIds: {
+					0: true,
+				},
+			}}
 			stateReducer={tableStateSingleSelectReducer}
 			emptyTableContent={"No runs"}
 			density="extra-condensed"
