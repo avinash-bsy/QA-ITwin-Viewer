@@ -76,7 +76,7 @@ const ClashTestsWidget = () => {
 		}
 	};
 
-	const onRowClick = async (_: any, row: any) => {
+	const onRowClick = (_: any, row: any) => {
 		if (iModelConnection) {
 			setIsAutoSelect(false);
 			row.toggleRowSelected(true);

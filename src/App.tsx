@@ -12,16 +12,15 @@ import { FillCentered } from "@itwin/core-react";
 import { ProgressLinear } from "@itwin/itwinui-react";
 import { MeasureTools, MeasureToolsUiItemsProvider } from "@itwin/measure-tools-react";
 import { PropertyGridManager, PropertyGridUiItemsProvider } from "@itwin/property-grid-react";
-import { TreeWidget, TreeWidgetUiItemsProvider } from "@itwin/tree-widget-react";
+import { TreeWidget } from "@itwin/tree-widget-react";
 import {
 	useAccessToken,
 	Viewer,
 	ViewerContentToolsProvider,
 	ViewerNavigationToolsProvider,
 	ViewerPerformance,
-	ViewerStatusbarItemsProvider,
 } from "@itwin/web-viewer-react";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 
 import { ClashTestsWidgetProvider } from "./widgets/ClashTestsWidget";
 import { ClashRunsWidgetProvider } from "./widgets/ClashRunsWidget";

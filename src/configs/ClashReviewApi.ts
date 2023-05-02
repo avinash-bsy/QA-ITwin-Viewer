@@ -2,9 +2,8 @@
  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
-import { BeEvent, BeDuration } from "@itwin/core-bentley";
+import { BeEvent } from "@itwin/core-bentley";
 import { ColorDef, FeatureOverrideType } from "@itwin/core-common";
-import { CoreTools } from "@itwin/appui-react";
 import { EmphasizeElements, IModelApp, ViewChangeOptions, FitViewTool } from "@itwin/core-frontend";
 
 class HelperMethods {
@@ -68,7 +67,7 @@ export default class ClashReviewApi extends HelperMethods {
 		});
 
 		const changeSetData = await response.json();
-		return changeSetData.changeSets[0]?.id;
+		return changeSetData.changesets[0]?.id;
 	}
 
 	private static async getResultDetailsById(contextId: string, resultId: string) {
@@ -174,7 +173,7 @@ export default class ClashReviewApi extends HelperMethods {
 	}
 
 	public static async submitTestRunRequest(contextId: string, projectId: string, testId: string): Promise<any> {
-		if (process.env.USE_LATEST_CHANGESET) {
+		if (process.env.REACT_APP_USE_LATEST_CHANGESET) {
 			ClashReviewApi._changesetId = await ClashReviewApi.getLatestChangeSetIdForIModel(projectId);
 		} else {
 			ClashReviewApi._changesetId = process.env.IMJS_CHANGESET_ID!;
