@@ -2,9 +2,10 @@
  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
-import { BeEvent } from "@itwin/core-bentley";
+import { BeEvent, BeDuration } from "@itwin/core-bentley";
 import { ColorDef, FeatureOverrideType } from "@itwin/core-common";
-import { EmphasizeElements, IModelApp, ViewChangeOptions } from "@itwin/core-frontend";
+import { CoreTools } from "@itwin/appui-react";
+import { EmphasizeElements, IModelApp, ViewChangeOptions, FitViewTool } from "@itwin/core-frontend";
 
 class HelperMethods {
 	public static structureDataForRunWidget(data: any) {
@@ -70,11 +71,11 @@ export default class ClashReviewApi extends HelperMethods {
 		return changeSetData.changeSets[0]?.id;
 	}
 
-	private static async getResultDetailsById(resultId: string) {
+	private static async getResultDetailsById(contextId: string, resultId: string) {
 		const resultData = await fetch(`${ClashReviewApi._RAS_BASE_URL}/results/${resultId}`, {
 			headers: {
 				accept: "application/json",
-				context: process.env.IMJS_CONTEXT_ID!,
+				context: contextId,
 				Authorization: ClashReviewApi._accessToken,
 			},
 		});
@@ -83,9 +84,9 @@ export default class ClashReviewApi extends HelperMethods {
 		return rowData;
 	}
 
-	private static pollForResultStatusChange(resultId: string, testId: string): void {
+	private static pollForResultStatusChange(contextId: string, resultId: string, testId: string): void {
 		const timer = setInterval(async () => {
-			const resultData = await ClashReviewApi.getResultDetailsById(resultId);
+			const resultData = await ClashReviewApi.getResultDetailsById(contextId, resultId);
 			const structuredRunData = ClashReviewApi.structureDataForRunWidget(resultData);
 			const structuredResultData = ClashReviewApi.structureDataForResultWidget(resultData);
 
@@ -163,16 +164,16 @@ export default class ClashReviewApi extends HelperMethods {
 		return ClashReviewApi._clashTestRuns[testId];
 	}
 
-	public static async getClashResults(resultId: string): Promise<any> {
+	public static async getClashResults(contextId: string, resultId: string): Promise<any> {
 		if (ClashReviewApi._clashResults[resultId] === undefined) {
-			const resultData = await ClashReviewApi.getResultDetailsById(resultId);
+			const resultData = await ClashReviewApi.getResultDetailsById(contextId, resultId);
 			ClashReviewApi._clashResults[resultId] = ClashReviewApi.structureDataForResultWidget(resultData);
 		}
 
 		return ClashReviewApi._clashResults[resultId];
 	}
 
-	public static async submitTestRunRequest(projectId: string, testId: string): Promise<any> {
+	public static async submitTestRunRequest(contextId: string, projectId: string, testId: string): Promise<any> {
 		if (process.env.USE_LATEST_CHANGESET) {
 			ClashReviewApi._changesetId = await ClashReviewApi.getLatestChangeSetIdForIModel(projectId);
 		} else {
@@ -190,7 +191,7 @@ export default class ClashReviewApi extends HelperMethods {
 			},
 		];
 
-		const response = await fetch(`${ClashReviewApi._RMS_BASE_URL}/contexts/${process.env.IMJS_CONTEXT_ID}/tests/run`, {
+		const response = await fetch(`${ClashReviewApi._RMS_BASE_URL}/contexts/${contextId}/tests/run`, {
 			method: "POST",
 			headers: {
 				accept: "application/json",
@@ -205,9 +206,9 @@ export default class ClashReviewApi extends HelperMethods {
 
 		const resultId = responseData.status[0].resultId;
 
-		const resultData = await ClashReviewApi.getResultDetailsById(resultId);
+		const resultData = await ClashReviewApi.getResultDetailsById(contextId, resultId);
 		const structuredRunData = ClashReviewApi.structureDataForRunWidget(resultData);
-		ClashReviewApi.pollForResultStatusChange(resultId, testId);
+		ClashReviewApi.pollForResultStatusChange(contextId, resultId, testId);
 
 		return structuredRunData;
 	}
@@ -238,5 +239,6 @@ export default class ClashReviewApi extends HelperMethods {
 		const provider = EmphasizeElements.getOrCreate(vp);
 		provider.clearEmphasizedElements(vp);
 		provider.clearOverriddenElements(vp);
+		IModelApp.tools.run(FitViewTool.toolId, IModelApp.viewManager.selectedView, true);
 	}
 }

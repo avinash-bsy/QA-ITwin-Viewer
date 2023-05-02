@@ -17,7 +17,7 @@ interface TableRow extends Record<string, string> {
 const ClashRunsWidget = () => {
 	const [isAutoSelect, setIsAutoSelect] = useState<boolean>(true);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
-	const { runs, setRuns, setNewRunRequested, setClashResults, runId, testId, setRunId } = useClashContext();
+	const { runs, setRuns, setNewRunRequested, setClashResults, runId, testId, setRunId, iTwinId } = useClashContext();
 
 	const getJobStatusText = useCallback((jobStatus: string) => {
 		const statusMap: { [id: string]: any } = {
@@ -85,7 +85,7 @@ const ClashRunsWidget = () => {
 
 	const getClashRuns = async () => {
 		setIsLoading(true);
-		const clashRuns = await ClashReviewApi.getClashRuns(process.env.IMJS_ITWIN_ID!, testId);
+		const clashRuns = await ClashReviewApi.getClashRuns(iTwinId, testId);
 		if (isAutoSelect) {
 			setRunId(clashRuns[0]?.id);
 		}

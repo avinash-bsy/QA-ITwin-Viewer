@@ -29,10 +29,10 @@ import { ClashResultsWidgetProvider } from "./widgets/ClashResultsWidget";
 
 import { history } from "./configs/history";
 import ClashReviewApi from "./configs/ClashReviewApi";
+import { useClashContext } from "./context/ClashContext";
 
 const App: React.FC = () => {
-	const [iModelId, setIModelId] = useState(process.env.IMJS_IMODEL_ID);
-	const [iTwinId, setITwinId] = useState(process.env.IMJS_ITWIN_ID);
+	const { iTwinId, iModelId, setIModelId, setITwinId } = useClashContext();
 
 	const accessToken = useAccessToken();
 
@@ -71,11 +71,15 @@ const App: React.FC = () => {
 					throw new Error(
 						"Please add a valid iTwin ID in the .env file and restart the application or add it to the iTwinId query parameter in the url and refresh the page. See the README for more information."
 					);
+				} else {
+					setITwinId(process.env.IMJS_ITWIN_ID!);
 				}
 			}
 
 			if (urlParams.has("iModelId")) {
 				setIModelId(urlParams.get("iModelId") as string);
+			} else {
+				setIModelId(process.env.IMJS_IMODEL_ID!);
 			}
 
 			ClashReviewApi.setAccessToken(accessToken);

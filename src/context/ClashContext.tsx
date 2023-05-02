@@ -8,6 +8,10 @@ interface ClashContextType {
 	runId: string;
 	resultId: string;
 	newRunRequested: string | null;
+	iTwinId: string;
+	iModelId: string;
+	setITwinId: React.Dispatch<React.SetStateAction<string>>;
+	setIModelId: React.Dispatch<React.SetStateAction<string>>;
 	setNewRunRequested: React.Dispatch<React.SetStateAction<string | null>>;
 	setClashTests: React.Dispatch<React.SetStateAction<Array<any>>>;
 	setRuns: React.Dispatch<React.SetStateAction<Array<any>>>;
@@ -25,6 +29,10 @@ const ClashContext = React.createContext<ClashContextType>({
 	runId: "",
 	resultId: "",
 	newRunRequested: null,
+	iTwinId: "",
+	iModelId: "",
+	setIModelId: () => {},
+	setITwinId: () => {},
 	setTestId: () => {},
 	setRunId: () => {},
 	setResultId: () => {},
@@ -41,9 +49,8 @@ const ClashContextProvider: React.FC = ({ children }) => {
 	const [testId, setTestId] = useState<string>("");
 	const [runId, setRunId] = useState<string>("");
 	const [resultId, setResultId] = useState<string>("");
-	const [testsLoading, setTestsLoading] = useState<boolean>(true);
-	const [runsLoading, setRunsLoading] = useState<boolean>(false);
-	const [resultsLoading, setResultsLoading] = useState<boolean>(false);
+	const [iTwinId, setITwinId] = useState<string>("");
+	const [iModelId, setIModelId] = useState<string>("");
 	const [newRunRequested, setNewRunRequested] = useState<string | null>(null);
 
 	const contextValues: ClashContextType = {
@@ -54,6 +61,10 @@ const ClashContextProvider: React.FC = ({ children }) => {
 		testId,
 		resultId,
 		runId,
+		iTwinId,
+		iModelId,
+		setITwinId,
+		setIModelId,
 		setNewRunRequested,
 		setClashTests,
 		setClashResults,

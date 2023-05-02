@@ -25,7 +25,7 @@ export interface ElementPair {
 
 const ClashResultsWidget = () => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
-	const { clashResults, runId, testId, setClashResults } = useClashContext();
+	const { clashResults, runId, testId, setClashResults, iTwinId } = useClashContext();
 
 	const columnDefinition = useMemo(
 		() => [
@@ -106,7 +106,7 @@ const ClashResultsWidget = () => {
 
 	const getClashResults = async () => {
 		setIsLoading(true);
-		const clashResults = await ClashReviewApi.getClashResults(runId);
+		const clashResults = await ClashReviewApi.getClashResults(iTwinId, runId);
 		setClashResults(clashResults);
 		setIsLoading(false);
 	};

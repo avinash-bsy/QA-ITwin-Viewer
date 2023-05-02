@@ -2,8 +2,8 @@
  * Copyright (c) Bentley Systems, Incorporated. All rights reserved.
  * See LICENSE.md in the project root for license terms and full copyright notice.
  *--------------------------------------------------------------------------------------------*/
-import { useEffect, useMemo, useState, useCallback } from "react";
-import { actions, ActionType, MetaBase, TableState } from "react-table";
+import { useEffect, useMemo, useState } from "react";
+import { actions, ActionType } from "react-table";
 import { AbstractWidgetProps, StagePanelLocation, StagePanelSection, UiItemsProvider, WidgetState } from "@itwin/appui-abstract";
 import { useActiveIModelConnection } from "@itwin/appui-react";
 import { Table, DefaultCell } from "@itwin/itwinui-react";
@@ -19,7 +19,7 @@ const ClashTestsWidget = () => {
 	const iModelConnection = useActiveIModelConnection();
 	const [isAutoSelect, setIsAutoSelect] = useState<boolean>(true);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
-	const { clashTests, newRunRequested, setClashTests, setNewRunRequested, setTestId, setRuns } = useClashContext();
+	const { clashTests, newRunRequested, setClashTests, setNewRunRequested, setTestId, setRuns, iModelId, iTwinId } = useClashContext();
 
 	const columnDefinition = useMemo(() => {
 		return [
@@ -87,7 +87,7 @@ const ClashTestsWidget = () => {
 	const handleRunCreation = async (event: React.MouseEvent, testId: string) => {
 		try {
 			setNewRunRequested(testId);
-			const response = await ClashReviewApi.submitTestRunRequest(process.env.IMJS_IMODEL_ID!, testId);
+			const response = await ClashReviewApi.submitTestRunRequest(iTwinId, iModelId, testId);
 			setRuns((runs) => {
 				const updatedRuns = runs.map((run: any) => {
 					if (run.id === response.id) {
