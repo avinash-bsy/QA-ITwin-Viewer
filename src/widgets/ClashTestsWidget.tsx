@@ -17,7 +17,6 @@ interface TableRow extends Record<string, string> {
 
 const ClashTestsWidget = () => {
 	const iModelConnection = useActiveIModelConnection();
-	const [isAutoSelect, setIsAutoSelect] = useState<boolean>(true);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const { clashTests, newRunRequested, setClashTests, setNewRunRequested, setTestId, setRuns, iModelId, iTwinId } = useClashContext();
 
@@ -66,9 +65,7 @@ const ClashTestsWidget = () => {
 		try {
 			setIsLoading(true);
 			const data = await ClashReviewApi.getClashTests(iTwinId!);
-			if (isAutoSelect) {
-				setTestId(data.rows[0]?.id);
-			}
+			setTestId(data.rows[0]?.id);
 			setClashTests(data.rows);
 			setIsLoading(false);
 		} catch (error) {
@@ -78,7 +75,6 @@ const ClashTestsWidget = () => {
 
 	const onRowClick = (_: any, row: any) => {
 		if (iModelConnection) {
-			setIsAutoSelect(false);
 			row.toggleRowSelected(true);
 			setTestId(row.original.id);
 		}

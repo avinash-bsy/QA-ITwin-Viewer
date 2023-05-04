@@ -15,7 +15,6 @@ interface TableRow extends Record<string, string> {
 }
 
 const ClashRunsWidget = () => {
-	const [isAutoSelect, setIsAutoSelect] = useState<boolean>(true);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const { runs, setRuns, setNewRunRequested, setClashResults, runId, testId, setRunId, iTwinId } = useClashContext();
 
@@ -65,7 +64,6 @@ const ClashRunsWidget = () => {
 
 	const onRowClick = useCallback(
 		async (_: any, row: any) => {
-			setIsAutoSelect(false);
 			row.toggleRowSelected(true);
 			setRunId(row.original.id);
 		},
@@ -86,9 +84,7 @@ const ClashRunsWidget = () => {
 	const getClashRuns = async () => {
 		setIsLoading(true);
 		const clashRuns = await ClashReviewApi.getClashRuns(iTwinId, testId);
-		if (isAutoSelect) {
-			setRunId(clashRuns[0]?.id);
-		}
+		setRunId(clashRuns[0]?.id);
 		setRuns(clashRuns);
 		setIsLoading(false);
 	};
