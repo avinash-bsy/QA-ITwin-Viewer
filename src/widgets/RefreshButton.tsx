@@ -1,6 +1,8 @@
 import { UiItemsProvider } from "@itwin/appui-react";
 import { IModelApp } from "@itwin/core-frontend";
 import { ToolbarItemUtilities, CommonToolbarItem, ToolbarOrientation, ToolbarUsage } from "@itwin/appui-abstract";
+import { FitViewTool } from "@itwin/core-frontend";
+import ClashReviewApi from "../configs/ClashReviewApi";
 
 export class CustomNavigationToolsProvider implements UiItemsProvider {
 	public readonly id = "refresh-button";
@@ -12,9 +14,10 @@ export class CustomNavigationToolsProvider implements UiItemsProvider {
 	): CommonToolbarItem[] {
 		const items: CommonToolbarItem[] = [];
 		if (toolbarUsage == 1 && toolbarOrientation == 0) {
-			const refreshButton = ToolbarItemUtilities.createActionButton("refresh-button", 100, "icon-refresh", "Refresh Viewer", () =>
-				IModelApp.viewManager.refreshForModifiedModels(undefined)
-			);
+			const refreshButton = ToolbarItemUtilities.createActionButton("refresh-button", 100, "icon-refresh", "Refresh Viewer", () => {
+				IModelApp.viewManager.refreshForModifiedModels(undefined);
+				ClashReviewApi.resetDisplay();
+			});
 
 			items.push(refreshButton);
 		}
