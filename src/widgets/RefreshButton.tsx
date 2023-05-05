@@ -1,26 +1,24 @@
-import {
-	AbstractWidgetProps,
-	StagePanelLocation,
-	StagePanelSection,
-	UiItemsProvider,
-	WidgetState,
-	ToolbarItem,
-	ActionButton,
-	ConditionalStringValue,
-} from "@itwin/appui-abstract";
-import { Button } from "@itwin/itwinui-react";
+import { UiItemsProvider } from "@itwin/appui-react";
+import { IModelApp } from "@itwin/core-frontend";
+import { ToolbarItemUtilities, CommonToolbarItem, ToolbarOrientation, ToolbarUsage } from "@itwin/appui-abstract";
 
-const RefreshButton = () => {
-	return <Button>Refresh</Button>;
-};
+export class CustomNavigationToolsProvider implements UiItemsProvider {
+	public readonly id = "refresh-button";
+	public provideToolbarButtonItems(
+		_stageId: string,
+		_stageUsage: string,
+		toolbarUsage: ToolbarUsage,
+		toolbarOrientation: ToolbarOrientation
+	): CommonToolbarItem[] {
+		const items: CommonToolbarItem[] = [];
+		if (toolbarUsage == 1 && toolbarOrientation == 0) {
+			const refreshButton = ToolbarItemUtilities.createActionButton("refresh-button", 100, "icon-refresh", "Refresh Viewer", () =>
+				IModelApp.viewManager.refreshForModifiedModels(undefined)
+			);
 
-export class RefreshButtonToolbarItem implements ActionButton {
-	public readonly id: string = "RefreshButton";
-	public readonly icon: string | ConditionalStringValue = "";
-	public readonly label: string | ConditionalStringValue = "";
-	public readonly itemPriority: number = 1;
+			items.push(refreshButton);
+		}
 
-	public readonly execute = () => {
-		alert("clicked");
-	};
+		return items;
+	}
 }

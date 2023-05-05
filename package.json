@@ -23,6 +23,7 @@
     "@itwin/core-telemetry": "^3.7.1",
     "@itwin/imodel-components-react": "^3.7.1",
     "@itwin/imodels-access-frontend": "^1.0.2",
+    "@itwin/itwinui-icons-react": "^2.2.0",
     "@itwin/itwinui-react": "^1.48.2",
     "@itwin/measure-tools-react": "^0.7.3",
     "@itwin/presentation-common": "^3.7.1",

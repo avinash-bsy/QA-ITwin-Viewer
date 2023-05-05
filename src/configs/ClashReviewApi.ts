@@ -233,7 +233,6 @@ export default class ClashReviewApi extends HelperMethods {
 
 	public static resetDisplay() {
 		if (!IModelApp.viewManager.selectedView) return;
-
 		const vp = IModelApp.viewManager.selectedView;
 		const provider = EmphasizeElements.getOrCreate(vp);
 		provider.clearEmphasizedElements(vp);

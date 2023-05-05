@@ -29,6 +29,7 @@ import { ClashResultsWidgetProvider } from "./widgets/ClashResultsWidget";
 import { history } from "./configs/history";
 import ClashReviewApi from "./configs/ClashReviewApi";
 import { useClashContext } from "./context/ClashContext";
+import { CustomNavigationToolsProvider } from "./widgets/RefreshButton";
 
 const App: React.FC = () => {
 	const { iTwinId, iModelId, setIModelId, setITwinId } = useClashContext();
@@ -156,14 +157,17 @@ const App: React.FC = () => {
 					new ClashTestsWidgetProvider(),
 					new ClashRunsWidgetProvider(),
 					new ClashResultsWidgetProvider(),
-					new ViewerNavigationToolsProvider(),
+					new CustomNavigationToolsProvider(),
 					new ViewerContentToolsProvider({
 						vertical: {
 							measureGroup: false,
 						},
 					}),
+					new ViewerNavigationToolsProvider(),
 					// new ViewerStatusbarItemsProvider(),
 					// new TreeWidgetUiItemsProvider(),
+					// new GroupingMappingProvider(),
+					// new RefreshButtonToolbarItem(),
 					new PropertyGridUiItemsProvider({
 						enableCopyingPropertyText: true,
 					}),

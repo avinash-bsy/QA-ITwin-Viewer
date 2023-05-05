@@ -6,10 +6,11 @@ import { useEffect, useMemo, useState } from "react";
 import { actions, ActionType } from "react-table";
 import { AbstractWidgetProps, StagePanelLocation, StagePanelSection, UiItemsProvider, WidgetState } from "@itwin/appui-abstract";
 import { useActiveIModelConnection } from "@itwin/appui-react";
-import { Table, DefaultCell } from "@itwin/itwinui-react";
+import { Table, DefaultCell, IconButton } from "@itwin/itwinui-react";
 import ClashReviewApi from "../configs/ClashReviewApi";
 import { useClashContext } from "../context/ClashContext";
 import "../App.scss";
+import { SvgPlay, SvgSync } from "@itwin/itwinui-icons-react";
 
 interface TableRow extends Record<string, string> {
 	name: string;
@@ -33,14 +34,17 @@ const ClashTestsWidget = () => {
 							<DefaultCell {...props} style={{ display: "flex", justifyContent: "space-between" }}>
 								{props.cellProps.row.original.name}
 								{props.cellProps.row.original.id === newRunRequested ? (
-									<button disabled={true}>Loading</button>
+									<IconButton style={{ backgroundColor: "transparent", border: "none", padding: 0 }} disabled={true}>
+										<SvgSync />
+									</IconButton>
 								) : (
-									<button
+									<IconButton
+										style={{ backgroundColor: "transparent", border: "none", padding: 0 }}
 										className="play-button"
 										disabled={newRunRequested !== null}
 										onClick={(e) => handleRunCreation(e, props.cellProps.row.original.id)}>
-										Run
-									</button>
+										<SvgPlay />
+									</IconButton>
 								)}
 							</DefaultCell>
 						),
