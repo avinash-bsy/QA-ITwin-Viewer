@@ -12,6 +12,7 @@ import ReactDOM from "react-dom";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import { ClashContextProvider } from "./context/ClashContext";
+import { ThemeProvider } from "@itwin/itwinui-react";
 
 globalThis.IMJS_URL_PREFIX = process.env.IMJS_URL_PREFIX || "";
 
@@ -37,7 +38,9 @@ if (redirectUrl.pathname === window.location.pathname) {
 	ReactDOM.render(
 		<React.StrictMode>
 			<ClashContextProvider>
-				<App />
+				<ThemeProvider theme={"os"}>
+					<App />
+				</ThemeProvider>
 			</ClashContextProvider>
 		</React.StrictMode>,
 		document.getElementById("root")

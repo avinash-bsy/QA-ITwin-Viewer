@@ -9,8 +9,9 @@ import { useActiveIModelConnection } from "@itwin/appui-react";
 import { Table, DefaultCell, IconButton } from "@itwin/itwinui-react";
 import ClashReviewApi from "../configs/ClashReviewApi";
 import { useClashContext } from "../context/ClashContext";
+import { SvgPlay, SvgSync, SvgEdit, SvgAdd } from "@itwin/itwinui-icons-react";
+import ClashTestModel from "./ClashTestModelNew";
 import "../App.scss";
-import { SvgPlay, SvgSync } from "@itwin/itwinui-icons-react";
 
 interface TableRow extends Record<string, string> {
 	name: string;
@@ -19,6 +20,8 @@ interface TableRow extends Record<string, string> {
 const ClashTestsWidget = () => {
 	const iModelConnection = useActiveIModelConnection();
 	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [isOpen, setIsOpen] = useState<boolean>(false);
+	const [currentTest, setCurrentTest] = useState<null | string>(null);
 	const { clashTests, newRunRequested, setClashTests, setNewRunRequested, setTestId, setRuns, iModelId, iTwinId } = useClashContext();
 
 	const columnDefinition = useMemo(() => {
@@ -38,13 +41,23 @@ const ClashTestsWidget = () => {
 										<SvgSync />
 									</IconButton>
 								) : (
-									<IconButton
-										style={{ backgroundColor: "transparent", border: "none", padding: 0 }}
-										className="play-button"
-										disabled={newRunRequested !== null}
-										onClick={(e) => handleRunCreation(e, props.cellProps.row.original.id)}>
-										<SvgPlay />
-									</IconButton>
+									<div className="play-button">
+										<IconButton
+											style={{ backgroundColor: "transparent", border: "none", padding: 0 }}
+											disabled={newRunRequested !== null}
+											onClick={(e) => {
+												setCurrentTest(props.cellProps.row.original.id);
+												setIsOpen(true);
+											}}>
+											<SvgEdit />
+										</IconButton>
+										<IconButton
+											style={{ backgroundColor: "transparent", border: "none", padding: 0 }}
+											disabled={newRunRequested !== null}
+											onClick={(e) => handleRunCreation(e, props.cellProps.row.original.id)}>
+											<SvgPlay style={{ height: 22, width: 22 }} />
+										</IconButton>
+									</div>
 								)}
 							</DefaultCell>
 						),
@@ -103,6 +116,11 @@ const ClashTestsWidget = () => {
 		}
 	};
 
+	const handleOnClose = () => {
+		setIsOpen(false);
+		setCurrentTest(null);
+	};
+
 	useEffect(() => {
 		if (iModelConnection) {
 			getClashTests(iModelConnection.iTwinId!);
@@ -110,23 +128,34 @@ const ClashTestsWidget = () => {
 	}, [iModelConnection]);
 
 	return (
-		<Table<TableRow>
-			data={clashTests}
-			columns={columnDefinition}
-			isLoading={isLoading}
-			isSortable
-			initialState={{
-				selectedRowIds: {
-					0: true,
-				},
-			}}
-			onRowClick={onRowClick}
-			stateReducer={tableStateSingleSelectReducer}
-			emptyTableContent={"No tests"}
-			density="extra-condensed"
-			style={{ height: "100%" }}
-			className={newRunRequested ? "loading" : ""}
-		/>
+		<>
+			{/* <IconButton style={{ right: 0, position: "absolute", zIndex: 1 }} onClick={(e) => setIsOpen(true)}>
+				<SvgAdd />
+				&nbsp;&nbsp; New
+			</IconButton> */}
+			{/* <IconButton>
+				<SvgAdd />
+				&nbsp;&nbsp; New
+			</IconButton> */}
+			<Table<TableRow>
+				data={clashTests}
+				columns={columnDefinition}
+				isLoading={isLoading}
+				isSortable
+				initialState={{
+					selectedRowIds: {
+						0: true,
+					},
+				}}
+				onRowClick={onRowClick}
+				stateReducer={tableStateSingleSelectReducer}
+				emptyTableContent={"No tests"}
+				density="extra-condensed"
+				style={{ height: "100%", zIndex: -1 }}
+				className={newRunRequested ? "loading" : ""}
+			/>
+			{isOpen && <ClashTestModel isOpen={isOpen} handleOnClose={handleOnClose} currentTest={currentTest} />}
+		</>
 	);
 };
 

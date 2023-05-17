@@ -1,7 +1,6 @@
 import { UiItemsProvider } from "@itwin/appui-react";
 import { IModelApp } from "@itwin/core-frontend";
 import { ToolbarItemUtilities, CommonToolbarItem, ToolbarOrientation, ToolbarUsage } from "@itwin/appui-abstract";
-import { FitViewTool } from "@itwin/core-frontend";
 import ClashReviewApi from "../configs/ClashReviewApi";
 
 export class CustomNavigationToolsProvider implements UiItemsProvider {

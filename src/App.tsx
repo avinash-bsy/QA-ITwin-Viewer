@@ -164,10 +164,6 @@ const App: React.FC = () => {
 						},
 					}),
 					new ViewerNavigationToolsProvider(),
-					// new ViewerStatusbarItemsProvider(),
-					// new TreeWidgetUiItemsProvider(),
-					// new GroupingMappingProvider(),
-					// new RefreshButtonToolbarItem(),
 					new PropertyGridUiItemsProvider({
 						enableCopyingPropertyText: true,
 					}),

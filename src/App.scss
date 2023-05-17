@@ -11,19 +11,23 @@
 }
 
 .play-button {
-  display: none;
+  display: none !important;
 }
 
-.iui-cell:hover .play-button{
-  display: block;
+.iui-table-row:hover .play-button{
+  display: flex !important;
   cursor: pointer !important;
 }
 
-.iui-selected .play-button {
-  display: block;
+[aria-selected='true'] .play-button{
+  display: flex !important;
   cursor: pointer !important;
 }
 
 .loading {
   cursor :progress
+}
+
+.iui-checkbox::before{
+  border:none
 }

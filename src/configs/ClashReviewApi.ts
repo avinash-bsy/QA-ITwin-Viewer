@@ -51,6 +51,9 @@ export default class ClashReviewApi extends HelperMethods {
 	private static _RAS_BASE_URL: string = "https://qa-connect-resultsanalysisservice.bentley.com/v2"; // QA - RAS Endpoint
 	private static _accessToken: string = ""; // JWT Token - Bearer keyword inclusive
 	private static _changesetId: string = "";
+	private static _modelsAndCategories: { [id: string]: any } = {};
+	private static _mappings: { [id: string]: any } = {};
+	private static _groupings: { [id: string]: any } = {};
 	public static onResultStatusChanged = new BeEvent<any>();
 
 	public static setAccessToken(accessToken: string): void {
@@ -125,6 +128,38 @@ export default class ClashReviewApi extends HelperMethods {
 		}
 
 		return ClashReviewApi._clashTests[projectId];
+	}
+
+	public static async getClashTestDetailById(projectId: string, testId: string) {
+		const response = await fetch(
+			`https://qa-connect-designvalidationrulemanagement.bentley.com/v3/contexts/${projectId}/tests/${testId}`,
+			{
+				headers: {
+					Authorization: ClashReviewApi._accessToken,
+					"Include-User-Metadata": "false",
+				},
+			}
+		);
+
+		const testDetails = await response.json();
+		return testDetails;
+	}
+
+	public static async updateClashTest(projectId: string, testId: string, data: any) {
+		const response = await fetch(
+			`https://qa-connect-designvalidationrulemanagement.bentley.com/v3/contexts/${projectId}/tests/${testId}`,
+			{
+				method: "PUT",
+				headers: {
+					Authorization: ClashReviewApi._accessToken,
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(data),
+			}
+		);
+
+		const parsedResponse = await response.json();
+		return parsedResponse;
 	}
 
 	public static async getClashRuns(projectId: string, testId: string): Promise<any> {
@@ -210,6 +245,70 @@ export default class ClashReviewApi extends HelperMethods {
 		ClashReviewApi.pollForResultStatusChange(contextId, resultId, testId);
 
 		return structuredRunData;
+	}
+
+	public static async getModelsAndCategories(iModelId: string, projectId: string) {
+		if (ClashReviewApi._modelsAndCategories[iModelId] === undefined) {
+			const response = await fetch(
+				`https://qa-api.bentley.com/clashdetection/modelsAndCategories/imodels/${iModelId}?projectId=${projectId}`,
+				{
+					headers: {
+						Authorization: ClashReviewApi._accessToken,
+					},
+				}
+			);
+
+			ClashReviewApi._modelsAndCategories[iModelId] = await response.json();
+		}
+
+		return ClashReviewApi._modelsAndCategories[iModelId];
+	}
+
+	public static async getMappingAndGrouping(iModelId: string) {
+		if (ClashReviewApi._mappings[iModelId] === undefined) {
+			console.log("reached");
+			const response = await fetch(`https://qa-api.bentley.com/insights/reporting/datasources/imodels/${iModelId}/mappings`, {
+				headers: {
+					Authorization: ClashReviewApi._accessToken,
+				},
+			});
+
+			const parsedResponse = await response.json();
+			const mappings = parsedResponse.mappings;
+
+			for (const mapping of mappings) {
+				const associatedGroups = await ClashReviewApi.getGroupsForMappingId(iModelId, mapping.id);
+				mapping.subRows = associatedGroups.groups.map((group: any) => {
+					return {
+						...group,
+						mappingId: mapping.id,
+						name: group.groupName,
+					};
+				});
+				mapping.name = mapping.mappingName;
+			}
+
+			ClashReviewApi._mappings[iModelId] = mappings;
+		}
+
+		return ClashReviewApi._mappings[iModelId];
+	}
+
+	public static async getGroupsForMappingId(iModelId: string, mappingId: string) {
+		if (ClashReviewApi._groupings[mappingId] === undefined) {
+			const response = await fetch(
+				`https://qa-api.bentley.com/insights/reporting/datasources/imodels/${iModelId}/mappings/${mappingId}/groups`,
+				{
+					headers: {
+						Authorization: ClashReviewApi._accessToken,
+					},
+				}
+			);
+
+			ClashReviewApi._groupings[mappingId] = await response.json();
+		}
+
+		return ClashReviewApi._groupings[mappingId];
 	}
 
 	public static visualizeClash(elementAId: string, elementBId: string, isMarkerClick: boolean) {
