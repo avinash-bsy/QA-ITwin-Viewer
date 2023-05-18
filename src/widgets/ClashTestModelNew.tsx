@@ -36,7 +36,7 @@ interface GroupingAndMappingProps {
 const ClashTestModel = (props: ClashTestModelProps) => {
 	const [activeTab, setActiveTab] = useState<number>(0);
 	const [loading, setLoading] = useState<boolean>(false);
-	const [selectedDataItems, setSelectedDataItems] = useState<{ [id: string]: { [id: string]: Array<string> } }>({});
+	const [selectedDataItems, setSelectedDataItems] = useState<any>({});
 	const [dataItems, setDataItems] = useState<{ [id: string]: [{ [id: string]: string }] }>({});
 	const [testDetails, setTestDetails] = useState<any>({});
 	const { iTwinId, iModelId } = useClashContext();
@@ -81,23 +81,47 @@ const ClashTestModel = (props: ClashTestModelProps) => {
 		alert("set data added");
 	};
 
+	const formatQueryReference = (obj: { [id: string]: Array<string> }): string => {
+		let responseString = "";
+		if (obj) {
+			Object.entries(obj).map(([key, value]: [string, Array<string>], index: number) => {
+				responseString += key + ":[";
+				value.forEach((v: string, idx: number) => {
+					responseString += v;
+					if (idx !== value.length - 1) {
+						responseString += ",";
+					}
+				});
+
+				responseString += "]";
+
+				if (index !== value.length - 1) {
+					responseString += ";";
+				}
+			});
+		}
+
+		return responseString;
+	};
+
 	const saveUpdatedClashTest = async () => {
+		console.log(selectedDataItems);
 		testDetails.setA = {
 			...testDetails.setA,
-			modelIds: [...selectedDataItems.setA?.models],
-			categoryIds: [...selectedDataItems.setA.categories],
+			modelIds: [...(selectedDataItems.setA?.models || [])],
+			categoryIds: [...(selectedDataItems.setA?.categories || [])],
 			queries: {
 				type: 1,
-				queryReference: selectedDataItems.setA.mappingAndGroupings,
+				queryReference: formatQueryReference(selectedDataItems.setA?.mappingAndGroupings),
 			},
 		};
 		testDetails.setB = {
 			...testDetails.setB,
-			modelIds: [...selectedDataItems.setB?.models],
-			categoryIds: [...selectedDataItems.setB.categories],
+			modelIds: [...(selectedDataItems.setB?.models || [])],
+			categoryIds: [...(selectedDataItems.setB?.categories || [])],
 			queries: {
 				type: 1,
-				queryReference: selectedDataItems.setB.mappingAndGroupings,
+				queryReference: formatQueryReference(selectedDataItems.setB?.mappingAndGroupings),
 			},
 		};
 
@@ -116,6 +140,25 @@ const ClashTestModel = (props: ClashTestModelProps) => {
 		return { ...(selectedDataItems[activeTab === 0 ? "setA" : "setB"] || {}) };
 	};
 
+	const convertStringtoObject = (queryReference: string): { [id: string]: Array<string> } => {
+		if (queryReference) {
+			let responseObject: { [id: string]: Array<string> } = {};
+			const mappingAndGrouppings = queryReference.split(";");
+			mappingAndGrouppings.forEach((mappingAndGroupping) => {
+				const mappingId = mappingAndGroupping.split(":")[0];
+				const groupingIds = mappingAndGroupping.split(":")[1];
+
+				const groupingIdsString = groupingIds.substring(1, groupingIds.length - 1);
+				let groupingIdArray = groupingIdsString.split(",");
+				responseObject[mappingId] = groupingIdArray;
+			});
+
+			return responseObject;
+		} else {
+			return {};
+		}
+	};
+
 	const initApp = async () => {
 		setLoading(true);
 		const modelAndCategories = await ClashReviewApi.getModelsAndCategories(iModelId, iTwinId);
@@ -128,12 +171,12 @@ const ClashTestModel = (props: ClashTestModelProps) => {
 			setA: {
 				models: response.setA?.modelIds,
 				categories: response.setA?.categoryIds,
-				mappingAndGroupings: response.setA?.queries?.queryReference,
+				mappingAndGroupings: convertStringtoObject(response.setA?.queries?.queryReference),
 			},
 			setB: {
 				models: response.setB?.modelIds,
 				categories: response.setB?.categoryIds,
-				mappingAndGroupings: response.setB?.queries?.queryReference,
+				mappingAndGroupings: convertStringtoObject(response.setB?.queries?.queryReference),
 			},
 		});
 		setTestDetails(response);
@@ -248,7 +291,7 @@ const CommonInnerTabsComponent = (props: CommonComponentProps) => {
 			onTabSelected={(index: number) => {
 				setActiveTab(index);
 			}}>
-			{getContent()}
+			<div className="customModal">{getContent()}</div>
 			<div style={{ float: "right", marginTop: "10px" }}>
 				<Button
 					styleType="high-visibility"

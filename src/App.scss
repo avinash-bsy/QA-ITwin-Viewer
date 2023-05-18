@@ -31,3 +31,13 @@
 .iui-checkbox::before{
   border:none
 }
+
+.customModal .iui-table-header .iui-table-row .iui-table-cell{
+  background-color: var(--iui-color-background-accent-muted);
+  color : var(--iui-color-text-informational)
+}
+
+.iui-table-header .iui-table-row .iui-table-cell:hover {
+  background-color: var(--iui-color-background-accent-muted) !important;
+  color : var(--iui-color-text-informational)
+}
