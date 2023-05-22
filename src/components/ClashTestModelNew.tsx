@@ -432,7 +432,6 @@ const GroupingAndMapping = (props: GroupingAndMappingProps) => {
 			}
 		});
 
-		console.log(selectedRowIds);
 		return selectedRowIds;
 	};
 	return (

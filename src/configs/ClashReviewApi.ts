@@ -266,7 +266,6 @@ export default class ClashReviewApi extends HelperMethods {
 
 	public static async getMappingAndGrouping(iModelId: string) {
 		if (ClashReviewApi._mappings[iModelId] === undefined) {
-			console.log("reached");
 			const response = await fetch(`https://qa-api.bentley.com/insights/reporting/datasources/imodels/${iModelId}/mappings`, {
 				headers: {
 					Authorization: ClashReviewApi._accessToken,

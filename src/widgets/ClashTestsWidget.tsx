@@ -10,7 +10,7 @@ import { Table, DefaultCell, IconButton } from "@itwin/itwinui-react";
 import ClashReviewApi from "../configs/ClashReviewApi";
 import { useClashContext } from "../context/ClashContext";
 import { SvgPlay, SvgSync, SvgEdit, SvgAdd } from "@itwin/itwinui-icons-react";
-import ClashTestModel from "./ClashTestModelNew";
+import ClashTestModel from "../components/ClashTestModel";
 import "../App.scss";
 
 interface TableRow extends Record<string, string> {

@@ -29,7 +29,7 @@ import { ClashResultsWidgetProvider } from "./widgets/ClashResultsWidget";
 import { history } from "./configs/history";
 import ClashReviewApi from "./configs/ClashReviewApi";
 import { useClashContext } from "./context/ClashContext";
-import { CustomNavigationToolsProvider } from "./widgets/RefreshButton";
+import { CustomNavigationToolsProvider } from "./components/RefreshButton";
 
 const App: React.FC = () => {
 	const { iTwinId, iModelId, setIModelId, setITwinId } = useClashContext();
