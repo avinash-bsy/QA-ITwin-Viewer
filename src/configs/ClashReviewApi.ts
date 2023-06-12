@@ -349,6 +349,7 @@ export default class ClashReviewApi extends HelperMethods {
 	public static async getSuppressionRules(projectId: string) {
 		const response = await fetch(`${ClashReviewApi._RMS_BASE_URL}/contexts/${projectId}/suppressionrules`, {
 			headers: {
+				"Include-User-Metadata": "true",
 				Authorization: ClashReviewApi._accessToken,
 			},
 		});

@@ -41,7 +41,7 @@ const ListSuppressionRules: FunctionComponent<ListSuppressionRulesProps> = ({
 					},
 					{
 						id: "createdBy",
-						accessor: "createdBy",
+						accessor: "userMetadata.createdBy.name",
 						Header: "Created By",
 					},
 					{
