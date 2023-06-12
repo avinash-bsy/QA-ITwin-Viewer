@@ -54,6 +54,7 @@ export default class ClashReviewApi extends HelperMethods {
 	private static _modelsAndCategories: { [id: string]: any } = {};
 	private static _mappings: { [id: string]: any } = {};
 	private static _groupings: { [id: string]: any } = {};
+	private static _ruleTemplates: { [id: string]: any } = {};
 	public static onResultStatusChanged = new BeEvent<any>();
 
 	public static setAccessToken(accessToken: string): void {
@@ -114,6 +115,27 @@ export default class ClashReviewApi extends HelperMethods {
 		}, 5000);
 	}
 
+	private static async getAllRuleTemplates(projectId: string, continuationToken: string) {
+		const response = await fetch(`${ClashReviewApi._RMS_BASE_URL}/contexts/${projectId}/ruletemplates`, {
+			headers: {
+				Authorization: ClashReviewApi._accessToken,
+				continuationToken: continuationToken,
+				pageSize: "50",
+				accept: "application/json",
+			},
+		});
+
+		const responseData = await response.json();
+
+		if (responseData.hasMoreData) {
+			const data = await ClashReviewApi.getAllRuleTemplates(projectId, responseData.continuationToken);
+			responseData.rows = [...responseData.rows, ...data.rows];
+			return responseData;
+		} else {
+			return responseData;
+		}
+	}
+
 	public static async getClashTests(projectId: string): Promise<any> {
 		if (ClashReviewApi._clashTests[projectId] === undefined) {
 			const response = await fetch(`${ClashReviewApi._RMS_BASE_URL}/contexts/${projectId}/tests`, {
@@ -145,7 +167,7 @@ export default class ClashReviewApi extends HelperMethods {
 		return testDetails;
 	}
 
-	public static async updateClashTest(projectId: string, testId: string, data: any) {
+	public static async updateClashDetectionTest(projectId: string, testId: string, data: any) {
 		const response = await fetch(
 			`https://qa-connect-designvalidationrulemanagement.bentley.com/v3/contexts/${projectId}/tests/${testId}`,
 			{
@@ -157,6 +179,20 @@ export default class ClashReviewApi extends HelperMethods {
 				body: JSON.stringify(data),
 			}
 		);
+
+		const parsedResponse = await response.json();
+		return parsedResponse;
+	}
+
+	public static async createClashDetectionTest(projectId: string, data: any) {
+		const response = await fetch(`https://qa-connect-designvalidationrulemanagement.bentley.com/v3/contexts/${projectId}/tests`, {
+			method: "POST",
+			headers: {
+				Authorization: ClashReviewApi._accessToken,
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify([data]),
+		});
 
 		const parsedResponse = await response.json();
 		return parsedResponse;
@@ -308,6 +344,66 @@ export default class ClashReviewApi extends HelperMethods {
 		}
 
 		return ClashReviewApi._groupings[mappingId];
+	}
+
+	public static async getSuppressionRules(projectId: string) {
+		const response = await fetch(`${ClashReviewApi._RMS_BASE_URL}/contexts/${projectId}/suppressionrules`, {
+			headers: {
+				Authorization: ClashReviewApi._accessToken,
+			},
+		});
+
+		const dataRows = await response.json();
+		const filteredRows = dataRows.rows.filter((row: any) => row.templateId === "95d3e23f-e175-4979-b128-fff03fa231e3");
+
+		return filteredRows;
+	}
+
+	public static async getRuleTemplates(projectId: string) {
+		if (ClashReviewApi._ruleTemplates[projectId] === undefined) {
+			ClashReviewApi._ruleTemplates[projectId] = await ClashReviewApi.getAllRuleTemplates(projectId, "");
+		}
+
+		return ClashReviewApi._ruleTemplates[projectId];
+	}
+
+	public static async createSuppressionRule(projectId: string, body: any) {
+		const response = await fetch(`${ClashReviewApi._RMS_BASE_URL}/contexts/${projectId}/suppressionrules`, {
+			method: "POST",
+			headers: {
+				Authorization: ClashReviewApi._accessToken,
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(body),
+		});
+
+		const responseData = await response.json();
+		return responseData;
+	}
+
+	public static async updateSuppressionRule(projectId: string, ruleId: string, body: any) {
+		const response = await fetch(`${ClashReviewApi._RMS_BASE_URL}/contexts/${projectId}/suppressionrules/${ruleId}`, {
+			method: "PATCH",
+			headers: {
+				Authorization: ClashReviewApi._accessToken,
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(body),
+		});
+
+		const responseData = await response.json();
+		return responseData;
+	}
+
+	public static async getSuppressionRuleDetailsById(projectId: string, ruleId: string) {
+		const response = await fetch(`${ClashReviewApi._RMS_BASE_URL}/contexts/${projectId}/suppressionrules/${ruleId}`, {
+			headers: {
+				Authorization: ClashReviewApi._accessToken,
+			},
+		});
+
+		const responseData = await response.json();
+		return responseData;
 	}
 
 	public static visualizeClash(elementAId: string, elementBId: string, isMarkerClick: boolean) {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Table } from "@itwin/itwinui-react";
 
 interface CategoryComponentProps {
@@ -7,21 +7,21 @@ interface CategoryComponentProps {
 	setSelectedItems: (tab: "categories", ids: any) => void;
 }
 
-const CategoriesTab = (props: CategoryComponentProps) => {
-	const onSelect = (rows: any) => {
+const CategoriesTab = ({ setSelectedItems, categoriesList, selectedCategories }: CategoryComponentProps) => {
+	const onSelect = (rows: any): void => {
 		let selectedRows: Array<string> = [];
 
 		rows.forEach((row: any) => {
 			selectedRows.push(row.id);
 		});
 
-		props.setSelectedItems("categories", selectedRows);
+		setSelectedItems("categories", selectedRows);
 	};
 
-	const getSelectedRows = () => {
+	const getSelectedRows = (): { [id: number]: boolean } => {
 		var selectedRowIds: { [id: number]: boolean } = {};
-		props.categoriesList.map((category: any, index: number) => {
-			if (props.selectedCategories.includes(category.id)) {
+		categoriesList.forEach((category: any, index: number) => {
+			if (selectedCategories.includes(category.id)) {
 				selectedRowIds[index] = true;
 			}
 		});
@@ -29,16 +29,21 @@ const CategoriesTab = (props: CategoryComponentProps) => {
 		return selectedRowIds;
 	};
 
+	const columns = useMemo(
+		() => [
+			{
+				id: "name",
+				Header: "Name",
+				accessor: "displayName",
+			},
+		],
+		[]
+	);
+
 	return (
 		<Table
-			columns={[
-				{
-					id: "name",
-					Header: "Name",
-					accessor: "displayName",
-				},
-			]}
-			data={props.categoriesList}
+			columns={columns}
+			data={categoriesList}
 			emptyTableContent="No data."
 			isSelectable={true}
 			onSelect={onSelect}

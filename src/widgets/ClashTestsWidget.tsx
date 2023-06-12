@@ -6,12 +6,12 @@ import { useEffect, useMemo, useState } from "react";
 import { actions, ActionType } from "react-table";
 import { AbstractWidgetProps, StagePanelLocation, StagePanelSection, UiItemsProvider, WidgetState } from "@itwin/appui-abstract";
 import { useActiveIModelConnection } from "@itwin/appui-react";
-import { Table, DefaultCell, IconButton } from "@itwin/itwinui-react";
+import { Table, DefaultCell, IconButton, Dialog, Modal } from "@itwin/itwinui-react";
 import ClashReviewApi from "../configs/ClashReviewApi";
 import { useClashContext } from "../context/ClashContext";
 import { SvgPlay, SvgSync, SvgEdit, SvgAdd } from "@itwin/itwinui-icons-react";
-import ClashTestModel from "../components/ClashTestModel";
 import "../App.scss";
+import ModalContent from "../components/ClashDetectionTestModal/ClashDetectionModalContent";
 
 interface TableRow extends Record<string, string> {
 	name: string;
@@ -22,6 +22,7 @@ const ClashTestsWidget = () => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const [currentTest, setCurrentTest] = useState<null | string>(null);
+	const [method, setMethod] = useState<"Create" | "Update">("Update");
 	const { clashTests, newRunRequested, setClashTests, setNewRunRequested, setTestId, setRuns, iModelId, iTwinId } = useClashContext();
 
 	const columnDefinition = useMemo(() => {
@@ -48,6 +49,7 @@ const ClashTestsWidget = () => {
 											onClick={(e) => {
 												setCurrentTest(props.cellProps.row.original.id);
 												setIsOpen(true);
+												setMethod("Update");
 											}}>
 											<SvgEdit />
 										</IconButton>
@@ -133,10 +135,16 @@ const ClashTestsWidget = () => {
 				<SvgAdd />
 				&nbsp;&nbsp; New
 			</IconButton> */}
-			{/* <IconButton>
+			{/* <div></div> */}
+			<IconButton
+				onClick={() => {
+					setCurrentTest(null);
+					setIsOpen(true);
+					setMethod("Create");
+				}}>
 				<SvgAdd />
 				&nbsp;&nbsp; New
-			</IconButton> */}
+			</IconButton>
 			<Table<TableRow>
 				data={clashTests}
 				columns={columnDefinition}
@@ -154,7 +162,21 @@ const ClashTestsWidget = () => {
 				style={{ height: "100%", zIndex: -1 }}
 				className={newRunRequested ? "loading" : ""}
 			/>
-			{isOpen && <ClashTestModel isOpen={isOpen} handleOnClose={handleOnClose} currentTest={currentTest} />}
+			{isOpen && (
+				<Modal
+					style={{ width: "800px" }}
+					title={method === "Create" ? "Create Clash Detection Test" : "Modify Clash Detection Test"}
+					isOpen={true}
+					onClose={handleOnClose}
+					closeOnEsc
+					closeOnExternalClick
+					// preventDocumentScroll
+					// trapFocus
+					// setFocus
+					isDismissible>
+					<ModalContent method={method} currentTestId={currentTest} />
+				</Modal>
+			)}
 		</>
 	);
 };

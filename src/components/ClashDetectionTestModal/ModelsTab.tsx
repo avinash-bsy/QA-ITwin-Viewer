@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Table } from "@itwin/itwinui-react";
 
 interface ModelComponentProps {
@@ -7,21 +7,21 @@ interface ModelComponentProps {
 	setSelectedItems: (tab: "models", ids: any) => void;
 }
 
-const ModelsTab = (props: ModelComponentProps) => {
-	const onSelect = (rows: any) => {
+const ModelsTab = ({ selectedModels, modelsList, setSelectedItems }: ModelComponentProps) => {
+	const onSelect = (rows: any): void => {
 		let selectedRows: Array<string> = [];
 
 		rows.forEach((row: any) => {
 			selectedRows.push(row.id);
 		});
 
-		props.setSelectedItems("models", selectedRows);
+		setSelectedItems("models", selectedRows);
 	};
 
-	const getSelectedRows = () => {
+	const getSelectedRows = (): { [id: number]: boolean } => {
 		const selectedRowIds: { [id: number]: boolean } = {};
-		props.modelsList.map((model: any, index: number) => {
-			if (props.selectedModels.includes(model.id)) {
+		modelsList.map((model: any, index: number) => {
+			if (selectedModels.includes(model.id)) {
 				selectedRowIds[index] = true;
 			}
 		});
@@ -38,7 +38,7 @@ const ModelsTab = (props: ModelComponentProps) => {
 					accessor: "displayName",
 				},
 			]}
-			data={props.modelsList}
+			data={modelsList}
 			emptyTableContent="No data."
 			isSelectable={true}
 			onSelect={onSelect}

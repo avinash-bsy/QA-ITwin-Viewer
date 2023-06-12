@@ -32,6 +32,10 @@
   border:none
 }
 
+.customModal {
+  min-height: 400px
+}
+
 .customModal .iui-table-header .iui-table-row .iui-table-cell{
   background-color: var(--iui-color-background-accent-muted);
   color : var(--iui-color-text-informational)
