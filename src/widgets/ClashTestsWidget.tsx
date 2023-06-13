@@ -121,6 +121,7 @@ const ClashTestsWidget = () => {
 	const handleOnClose = () => {
 		setIsOpen(false);
 		setCurrentTest(null);
+		getClashTests(iModelConnection?.iTwinId!);
 	};
 
 	useEffect(() => {
