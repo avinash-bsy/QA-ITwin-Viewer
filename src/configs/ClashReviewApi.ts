@@ -244,10 +244,10 @@ export default class ClashReviewApi extends HelperMethods {
 	}
 
 	public static async submitTestRunRequest(contextId: string, projectId: string, testId: string): Promise<any> {
-		if (process.env.REACT_APP_USE_LATEST_CHANGESET) {
+		if (process.env.REACT_APP_REACT_APP_USE_LATEST_CHANGESET) {
 			ClashReviewApi._changesetId = await ClashReviewApi.getLatestChangeSetIdForIModel(projectId);
 		} else {
-			ClashReviewApi._changesetId = process.env.IMJS_CHANGESET_ID!;
+			ClashReviewApi._changesetId = process.env.REACT_APP_IMJS_CHANGESET_ID!;
 		}
 
 		const data = [
