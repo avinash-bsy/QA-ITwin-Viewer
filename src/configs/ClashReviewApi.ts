@@ -78,7 +78,7 @@ export default class ClashReviewApi extends HelperMethods {
 		const resultData = await fetch(`${ClashReviewApi._RAS_BASE_URL}/results/${resultId}`, {
 			headers: {
 				accept: "application/json",
-				context: contextId,
+				"itwin-id": contextId,
 				Authorization: ClashReviewApi._accessToken,
 			},
 		});
@@ -137,19 +137,18 @@ export default class ClashReviewApi extends HelperMethods {
 	}
 
 	public static async getClashTests(projectId: string): Promise<any> {
-		if (ClashReviewApi._clashTests[projectId] === undefined) {
-			const response = await fetch(`${ClashReviewApi._RMS_BASE_URL}/contexts/${projectId}/tests`, {
-				headers: {
-					accept: "application/json",
-					"Include-User-Metadata": "false",
-					Authorization: ClashReviewApi._accessToken,
-				},
-			});
+		// if (ClashReviewApi._clashTests[projectId] === undefined) {
+		const response = await fetch(`${ClashReviewApi._RMS_BASE_URL}/contexts/${projectId}/tests`, {
+			headers: {
+				accept: "application/json",
+				"Include-User-Metadata": "false",
+				Authorization: ClashReviewApi._accessToken,
+			},
+		});
 
-			ClashReviewApi._clashTests[projectId] = response.json();
-		}
+		const responseData = await response.json();
 
-		return ClashReviewApi._clashTests[projectId];
+		return responseData;
 	}
 
 	public static async getClashTestDetailById(projectId: string, testId: string) {
@@ -247,7 +246,7 @@ export default class ClashReviewApi extends HelperMethods {
 		if (process.env.REACT_APP_USE_LATEST_CHANGESET) {
 			ClashReviewApi._changesetId = await ClashReviewApi.getLatestChangeSetIdForIModel(projectId);
 		} else {
-			ClashReviewApi._changesetId = process.env.IMJS_CHANGESET_ID!;
+			ClashReviewApi._changesetId = process.env.REACT_APP_IMJS_CHANGESET_ID!;
 		}
 
 		const data = [

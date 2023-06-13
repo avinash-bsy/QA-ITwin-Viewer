@@ -19,6 +19,8 @@ const ClashDetectionModalContent = ({ method, currentTestId }: ModalContentProps
 	const { selectedDataItems, initializeSelectedItems, saveUpdatedSetData } = useSelectedItemState();
 	const [currentPage, setCurrentPage] = useState<PageTypes>(method === "Update" ? "setSelection" : "nameDescription");
 	const [testDetails, setTestDetails] = useState<any>({});
+	const [loading, setLoading] = useState<boolean>(false);
+	const { setClashTests } = useClashContext();
 
 	const { iTwinId } = useClashContext();
 
@@ -37,6 +39,7 @@ const ClashDetectionModalContent = ({ method, currentTestId }: ModalContentProps
 	}, [testDetails]);
 
 	const createClashDetectionTest = async () => {
+		setLoading(true);
 		addSetData();
 		testDetails.configType = 2;
 		testDetails.includeSubModels = true;
@@ -44,9 +47,17 @@ const ClashDetectionModalContent = ({ method, currentTestId }: ModalContentProps
 			...testDetails.advancedSettings,
 			longClash: true,
 			calculateOverlap: true,
+			toleranceOverlapValidation: testDetails.advancedSettings?.toleranceOverlapValidation || false,
 		};
-		await ClashReviewApi.createClashDetectionTest(iTwinId, testDetails);
+		testDetails.suppressTouching = testDetails.suppressTouching || false;
+		testDetails.touchingTolerance = testDetails.touchingTolerance || 0;
+		const response = await ClashReviewApi.createClashDetectionTest(iTwinId, testDetails);
+		console.log(response);
+		setClashTests((tests: any) => {
+			return [...tests];
+		});
 		setTestDetails({ ...testDetails });
+		setLoading(false);
 		alert("test created");
 	};
 
@@ -160,6 +171,7 @@ const ClashDetectionModalContent = ({ method, currentTestId }: ModalContentProps
 	};
 
 	const updateClashDetectionTest = async () => {
+		setLoading(true);
 		addSetData();
 
 		if (testDetails.tag) {
@@ -174,6 +186,7 @@ const ClashDetectionModalContent = ({ method, currentTestId }: ModalContentProps
 		const { contextId, createdBy, creationDate, id, lastModifiedBy, modificationDate, ...requiredData } = testDetails;
 
 		await ClashReviewApi.updateClashDetectionTest(iTwinId, currentTestId!, requiredData);
+		setLoading(false);
 		alert("Test updated successfully");
 	};
 
@@ -191,16 +204,26 @@ const ClashDetectionModalContent = ({ method, currentTestId }: ModalContentProps
 
 	return (
 		<>
-			<ModalContent>
+			<ModalContent className="modalContent">
 				{/* <Dialog.TitleBar titleText={getModalTitleText()} /> */}
-				<div>{getModalContent()}</div>
-				{currentPage !== "nameDescription" && (
-					<ModalFooter
-						handleSubmit={method === "Create" ? createClashDetectionTest : updateClashDetectionTest}
-						currentPage={currentPage}
-						setCurrentPage={setCurrentPage}
-						buttonLabel={method}
-					/>
+				{loading ? (
+					<div style={{ height: "100%", width: "100%" }}>
+						<ProgressRadial indeterminate={true} />
+					</div>
+				) : (
+					<>
+						<div>{getModalContent()}</div>
+						<div>
+							{currentPage !== "nameDescription" && (
+								<ModalFooter
+									handleSubmit={method === "Create" ? createClashDetectionTest : updateClashDetectionTest}
+									currentPage={currentPage}
+									setCurrentPage={setCurrentPage}
+									buttonLabel={method}
+								/>
+							)}
+						</div>
+					</>
 				)}
 			</ModalContent>
 		</>

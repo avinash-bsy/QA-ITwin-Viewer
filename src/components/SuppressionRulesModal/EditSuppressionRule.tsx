@@ -1,4 +1,4 @@
-import { Button, ModalButtonBar, ModalContent } from "@itwin/itwinui-react";
+import { Button, ModalButtonBar, ModalContent, ProgressRadial } from "@itwin/itwinui-react";
 import { Dispatch, FunctionComponent, SetStateAction, useState } from "react";
 import RuleDetails from "./RuleDetails";
 import { PageList } from "./SuppressionRulesModal";
@@ -13,9 +13,11 @@ interface EditSuppressionRuleProps {
 
 const EditSuppressionRule: FunctionComponent<EditSuppressionRuleProps> = ({ selectedRuleForEdit, setCurrentPage }) => {
 	const [ruleDetails, setRuleDetails] = useState<Record<string, any>>({});
+	const [loading, setLoading] = useState<boolean>(false);
 	const { iTwinId } = useClashContext();
 
 	const updateSuppressionRule = async () => {
+		setLoading(true);
 		const requestBody = {
 			name: ruleDetails.name,
 			reason: ruleDetails.reason,
@@ -27,9 +29,9 @@ const EditSuppressionRule: FunctionComponent<EditSuppressionRuleProps> = ({ sele
 			},
 		};
 
-		const response = await ClashReviewApi.updateSuppressionRule(iTwinId, selectedRuleForEdit, requestBody);
-
-		console.log(response);
+		await ClashReviewApi.updateSuppressionRule(iTwinId, selectedRuleForEdit, requestBody);
+		alert("Suppression rule updated successfully");
+		setLoading(false);
 	};
 
 	return (
@@ -44,7 +46,7 @@ const EditSuppressionRule: FunctionComponent<EditSuppressionRuleProps> = ({ sele
 					</Button>
 				</div>
 				<Button styleType="high-visibility" onClick={updateSuppressionRule}>
-					Update
+					Update {loading ? <ProgressRadial indeterminate={true} /> : <></>}
 				</Button>
 			</ModalButtonBar>
 		</>

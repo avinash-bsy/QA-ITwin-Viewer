@@ -14,23 +14,23 @@ import * as serviceWorker from "./serviceWorker";
 import { ClashContextProvider } from "./context/ClashContext";
 import { ThemeProvider } from "@itwin/itwinui-react";
 
-globalThis.IMJS_URL_PREFIX = process.env.IMJS_URL_PREFIX || "";
+globalThis.IMJS_URL_PREFIX = process.env.REACT_APP_IMJS_URL_PREFIX || "";
 
-if (!process.env.IMJS_AUTH_CLIENT_CLIENT_ID) {
+if (!process.env.REACT_APP_IMJS_AUTH_CLIENT_CLIENT_ID) {
 	throw new Error("Please add a valid OIDC client id to the .env file and restart the application. See the README for more information.");
 }
-if (!process.env.IMJS_AUTH_CLIENT_SCOPES) {
+if (!process.env.REACT_APP_IMJS_AUTH_CLIENT_SCOPES) {
 	throw new Error(
 		"Please add valid scopes for your OIDC client to the .env file and restart the application. See the README for more information."
 	);
 }
-if (!process.env.IMJS_AUTH_CLIENT_REDIRECT_URI) {
+if (!process.env.REACT_APP_IMJS_AUTH_CLIENT_REDIRECT_URI) {
 	throw new Error("Please add a valid redirect URI to the .env file and restart the application. See the README for more information.");
 }
 
-globalThis.IMJS_URL_PREFIX = process.env.IMJS_URL_PREFIX || "";
+globalThis.IMJS_URL_PREFIX = process.env.REACT_APP_IMJS_URL_PREFIX || "";
 
-const redirectUrl = new URL(process.env.IMJS_AUTH_CLIENT_REDIRECT_URI);
+const redirectUrl = new URL(process.env.REACT_APP_IMJS_AUTH_CLIENT_REDIRECT_URI);
 
 if (redirectUrl.pathname === window.location.pathname) {
 	BrowserAuthorizationCallbackHandler.handleSigninCallback(redirectUrl.toString()).catch(console.error);

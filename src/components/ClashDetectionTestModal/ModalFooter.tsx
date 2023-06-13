@@ -40,9 +40,9 @@ const ModalFooter = ({ handleSubmit, currentPage, setCurrentPage, buttonLabel }:
 						</IconButton>
 					</>
 				) : (
-					<Button onClick={handleback}>
+					<IconButton onClick={handleback}>
 						<SvgGoToStart style={{ width: "25", height: "25" }} />
-					</Button>
+					</IconButton>
 				)}
 			</div>
 			<div>

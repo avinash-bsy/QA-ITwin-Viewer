@@ -59,20 +59,6 @@ const CommonInnerTabs = ({ selectedDataItems, setData, saveUpdatedSetData }: Com
 				setActiveTab(index);
 			}}>
 			<div>{getContent()}</div>
-			<div style={{ float: "right", marginTop: "10px" }}>
-				{/* {showBackButton && (
-					<IconButton style={{ margin: "0px 10px" }} onClick={backButtonHandler}>
-						<SvgGoToStart style={{ width: "25", height: "25" }} />
-					</IconButton>
-				)} */}
-				{/* <Button
-					styleType="high-visibility"
-					onClick={() => {
-						saveUpdatedSetData(selectedItems);
-					}}>
-					Save
-				</Button> */}
-			</div>
 		</Tabs>
 	);
 };
