@@ -78,7 +78,7 @@ export default class ClashReviewApi extends HelperMethods {
 		const resultData = await fetch(`${ClashReviewApi._RAS_BASE_URL}/results/${resultId}`, {
 			headers: {
 				accept: "application/json",
-				context: contextId,
+				"itwin-id": contextId,
 				Authorization: ClashReviewApi._accessToken,
 			},
 		});
