@@ -44,8 +44,12 @@ const ClashDetectionModalContent = ({ method, currentTestId }: ModalContentProps
 			...testDetails.advancedSettings,
 			longClash: true,
 			calculateOverlap: true,
+			toleranceOverlapValidation: testDetails.advancedSettings?.toleranceOverlapValidation || false,
 		};
-		await ClashReviewApi.createClashDetectionTest(iTwinId, testDetails);
+		testDetails.suppressTouching = testDetails.suppressTouching || false;
+		testDetails.touchingTolerance = testDetails.touchingTolerance || 0;
+		const response = await ClashReviewApi.createClashDetectionTest(iTwinId, testDetails);
+		console.log(response);
 		setTestDetails({ ...testDetails });
 		alert("test created");
 	};
