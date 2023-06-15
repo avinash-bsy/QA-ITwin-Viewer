@@ -111,18 +111,6 @@ const RuleDetails: FunctionComponent<RuleDetailsProps> = ({ setRuleDetails, rule
 				style={{ margin: "10px 0px" }}
 				required
 			/>
-			<Label htmlFor="query-type-dropdown" required>
-				Type
-			</Label>
-			<Select<number>
-				options={[{ label: "Reporting Platform", value: 1 }]}
-				value={1}
-				placeholder={"Select Query Type"}
-				multiple={false}
-				disabled
-				id="query-type-dropdown"
-				style={{ margin: "10px 0px" }}
-			/>
 			<Label htmlFor="mapping-dropdown" required>
 				Mapping
 			</Label>

@@ -4,15 +4,23 @@ import ClashReviewApi from "../../configs/ClashReviewApi";
 import { useClashContext } from "../../context/ClashContext";
 
 const SelectRuleTemplates = ({ setSelectedRuleTemplate, selectedRuleTemplate }: any) => {
-	const [ruleTemplates, setRuleTemplates] = useState([]);
+	const [ruleTemplates, setRuleTemplates] = useState<any>([]);
 	const [loading, setLoading] = useState<boolean>(false);
 	const { iModelId, iTwinId } = useClashContext();
 
 	const getRuleTemplates = async () => {
 		setLoading(true);
 		let ruleTemplatesData = await ClashReviewApi.getRuleTemplates(iTwinId);
-		ruleTemplatesData = ruleTemplatesData.rows.filter((rule: any) => rule.name === "Suppression/Definition/Generic/MappingAndGrouping");
-		setRuleTemplates(ruleTemplatesData);
+		let filteredArray = [];
+		for (let rule of ruleTemplatesData.rows) {
+			if (rule.name === "Suppression/Definition/Generic/MappingAndGrouping") {
+				let selectedRule = Object.create(rule);
+				selectedRule.name = "Suppress Mapping And Grouping";
+				filteredArray.push(selectedRule);
+				break;
+			}
+		}
+		setRuleTemplates(filteredArray);
 		setLoading(false);
 	};
 
