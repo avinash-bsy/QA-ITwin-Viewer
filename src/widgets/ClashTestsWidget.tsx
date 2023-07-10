@@ -4,9 +4,9 @@
  *--------------------------------------------------------------------------------------------*/
 import { useEffect, useMemo, useState } from "react";
 import { actions, ActionType } from "react-table";
-import { AbstractWidgetProps, StagePanelLocation, StagePanelSection, UiItemsProvider, WidgetState } from "@itwin/appui-abstract";
+import { StagePanelLocation, StagePanelSection, UiItemsProvider, WidgetState, Widget } from "@itwin/appui-react";
 import { useActiveIModelConnection } from "@itwin/appui-react";
-import { Table, DefaultCell, IconButton, Dialog, Modal } from "@itwin/itwinui-react";
+import { Table, DefaultCell, IconButton, Modal } from "@itwin/itwinui-react";
 import ClashReviewApi from "../configs/ClashReviewApi";
 import { useClashContext } from "../context/ClashContext";
 import { SvgPlay, SvgSync, SvgEdit, SvgAdd } from "@itwin/itwinui-icons-react";
@@ -120,7 +120,7 @@ const ClashTestsWidget = () => {
 
 	const handleOnClose = () => {
 		setIsOpen(false);
-		setCurrentTest(null);
+		setCurrentTest("");
 		getClashTests(iModelConnection?.iTwinId!);
 	};
 
@@ -132,11 +132,6 @@ const ClashTestsWidget = () => {
 
 	return (
 		<>
-			{/* <IconButton style={{ right: 0, position: "absolute", zIndex: 1 }} onClick={(e) => setIsOpen(true)}>
-				<SvgAdd />
-				&nbsp;&nbsp; New
-			</IconButton> */}
-			{/* <div></div> */}
 			<IconButton
 				onClick={() => {
 					setCurrentTest(null);
@@ -190,14 +185,14 @@ export class ClashTestsWidgetProvider implements UiItemsProvider {
 		_stageUsage: string,
 		location: StagePanelLocation,
 		_section?: StagePanelSection
-	): ReadonlyArray<AbstractWidgetProps> {
-		const widgets: AbstractWidgetProps[] = [];
+	): ReadonlyArray<Widget> {
+		const widgets: Widget[] = [];
 		if (location === StagePanelLocation.Left && _section === StagePanelSection.Start) {
 			widgets.push({
 				id: "ClashTestsWidget",
 				label: "Tests",
 				defaultState: WidgetState.Open,
-				getWidgetContent: () => <ClashTestsWidget />,
+				content: <ClashTestsWidget />,
 			});
 		}
 		return widgets;

@@ -12,7 +12,7 @@ import { FillCentered } from "@itwin/core-react";
 import { ProgressLinear } from "@itwin/itwinui-react";
 import { MeasureTools, MeasureToolsUiItemsProvider } from "@itwin/measure-tools-react";
 import { PropertyGridManager, PropertyGridUiItemsProvider } from "@itwin/property-grid-react";
-import { TreeWidget } from "@itwin/tree-widget-react";
+// import { TreeWidget } from "@itwin/tree-widget-react";
 import {
 	useAccessToken,
 	Viewer,
@@ -132,7 +132,7 @@ const App: React.FC = () => {
 	const viewCreatorOptions = useMemo(() => ({ viewportConfigurer: viewConfiguration }), [viewConfiguration]);
 
 	const onIModelAppInit = useCallback(async () => {
-		await TreeWidget.initialize();
+		// await TreeWidget.initialize();
 		await PropertyGridManager.initialize();
 		await MeasureTools.startup();
 	}, []);

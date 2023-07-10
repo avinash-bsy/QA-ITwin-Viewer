@@ -5,7 +5,7 @@
 
 import "./index.scss";
 
-import { BrowserAuthorizationCallbackHandler } from "@itwin/browser-authorization";
+import { BrowserAuthorizationClient } from "@itwin/browser-authorization";
 import React from "react";
 import ReactDOM from "react-dom";
 
@@ -33,7 +33,7 @@ globalThis.IMJS_URL_PREFIX = process.env.REACT_APP_IMJS_URL_PREFIX || "";
 const redirectUrl = new URL(process.env.REACT_APP_IMJS_AUTH_CLIENT_REDIRECT_URI);
 
 if (redirectUrl.pathname === window.location.pathname) {
-	BrowserAuthorizationCallbackHandler.handleSigninCallback(redirectUrl.toString()).catch(console.error);
+	BrowserAuthorizationClient.handleSignInCallback().catch(console.error);
 } else {
 	ReactDOM.render(
 		<React.StrictMode>
