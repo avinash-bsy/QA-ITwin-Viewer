@@ -159,7 +159,7 @@ export class ClashRunsWidgetProvider implements UiItemsProvider {
 				content: <ClashRunsWidget />,
 			});
 		}
-		return widgets;
+		return widgets; 
 	}
 }
 
