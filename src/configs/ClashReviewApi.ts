@@ -47,8 +47,8 @@ export default class ClashReviewApi extends HelperMethods {
 	private static _clashTestRuns: { [id: string]: any } = {}; // List of all runs for a test
 	private static _clashRuns: { [id: string]: any } = {}; // List of all runs for a project
 	private static _clashResults: { [id: string]: any } = {}; // List of clash results for a run
-	private static _RMS_BASE_URL: string = "https://qa-connect-designvalidationrulemanagement.bentley.com/v3"; // QA - RMS Endpoint
-	private static _RAS_BASE_URL: string = "https://qa-connect-resultsanalysisservice.bentley.com/v2"; // QA - RAS Endpoint
+	private static _RMS_BASE_URL: string = "https://dev-connect-designvalidationrulemanagement.bentley.com/v3"; // QA - RMS Endpoint
+	private static _RAS_BASE_URL: string = "https://dev-connect-resultsanalysisservice.bentley.com/v2"; // QA - RAS Endpoint
 	private static _accessToken: string = ""; // JWT Token - Bearer keyword inclusive
 	private static _changesetId: string = "";
 	private static _modelsAndCategories: { [id: string]: any } = {};
@@ -62,7 +62,7 @@ export default class ClashReviewApi extends HelperMethods {
 	}
 
 	private static async getLatestChangeSetIdForIModel(iModelId: string) {
-		const response = await fetch(`https://qa-api.bentley.com/imodels/${iModelId}/changesets?$top=1&$orderBy=index desc`, {
+		const response = await fetch(`https://dev-api.bentley.com/imodels/${iModelId}/changesets?$top=1&$orderBy=index desc`, {
 			headers: {
 				Accept: "application/vnd.bentley.itwin-platform.v2+json",
 				Prefer: "return=minimal",
@@ -152,7 +152,7 @@ export default class ClashReviewApi extends HelperMethods {
 
 	public static async getClashTestDetailById(projectId: string, testId: string) {
 		const response = await fetch(
-			`https://qa-connect-designvalidationrulemanagement.bentley.com/v3/contexts/${projectId}/tests/${testId}`,
+			`https://dev-connect-designvalidationrulemanagement.bentley.com/v3/contexts/${projectId}/tests/${testId}`,
 			{
 				headers: {
 					Authorization: ClashReviewApi._accessToken,
@@ -167,7 +167,7 @@ export default class ClashReviewApi extends HelperMethods {
 
 	public static async updateClashDetectionTest(projectId: string, testId: string, data: any) {
 		const response = await fetch(
-			`https://qa-connect-designvalidationrulemanagement.bentley.com/v3/contexts/${projectId}/tests/${testId}`,
+			`https://dev-connect-designvalidationrulemanagement.bentley.com/v3/contexts/${projectId}/tests/${testId}`,
 			{
 				method: "PUT",
 				headers: {
@@ -183,7 +183,7 @@ export default class ClashReviewApi extends HelperMethods {
 	}
 
 	public static async createClashDetectionTest(projectId: string, data: any) {
-		const response = await fetch(`https://qa-connect-designvalidationrulemanagement.bentley.com/v3/contexts/${projectId}/tests`, {
+		const response = await fetch(`https://dev-connect-designvalidationrulemanagement.bentley.com/v3/contexts/${projectId}/tests`, {
 			method: "POST",
 			headers: {
 				Authorization: ClashReviewApi._accessToken,
@@ -284,7 +284,7 @@ export default class ClashReviewApi extends HelperMethods {
 	public static async getModelsAndCategories(iModelId: string, projectId: string) {
 		if (ClashReviewApi._modelsAndCategories[iModelId] === undefined) {
 			const response = await fetch(
-				`https://qa-api.bentley.com/clashdetection/modelsAndCategories/imodels/${iModelId}?projectId=${projectId}`,
+				`https://dev-api.bentley.com/clashdetection/modelsAndCategories/imodels/${iModelId}?projectId=${projectId}`,
 				{
 					headers: {
 						Authorization: ClashReviewApi._accessToken,
@@ -300,7 +300,7 @@ export default class ClashReviewApi extends HelperMethods {
 
 	public static async getMappingAndGrouping(iModelId: string) {
 		if (ClashReviewApi._mappings[iModelId] === undefined) {
-			const response = await fetch(`https://qa-api.bentley.com/insights/reporting/datasources/imodels/${iModelId}/mappings`, {
+			const response = await fetch(`https://dev-api.bentley.com/insights/reporting/datasources/imodels/${iModelId}/mappings`, {
 				headers: {
 					Authorization: ClashReviewApi._accessToken,
 				},
@@ -330,7 +330,7 @@ export default class ClashReviewApi extends HelperMethods {
 	public static async getGroupsForMappingId(iModelId: string, mappingId: string) {
 		if (ClashReviewApi._groupings[mappingId] === undefined) {
 			const response = await fetch(
-				`https://qa-api.bentley.com/insights/reporting/datasources/imodels/${iModelId}/mappings/${mappingId}/groups`,
+				`https://dev-api.bentley.com/insights/reporting/datasources/imodels/${iModelId}/mappings/${mappingId}/groups`,
 				{
 					headers: {
 						Authorization: ClashReviewApi._accessToken,
