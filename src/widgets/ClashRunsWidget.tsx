@@ -5,7 +5,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { actions, ActionType, MetaBase, TableState } from "react-table";
 import { StagePanelLocation, StagePanelSection, UiItemsProvider, WidgetState, Widget } from "@itwin/appui-react";
-import { Table, DefaultCell } from "@itwin/itwinui-react";
+import { Table, DefaultCell, ExpandableBlock } from "@itwin/itwinui-react";
 import { useClashContext } from "../context/ClashContext";
 import ClashReviewApi from "../configs/ClashReviewApi";
 
@@ -89,6 +89,9 @@ const ClashRunsWidget = () => {
 		setIsLoading(false);
 	};
 
+	const onExpand = () => {
+	}
+
 	useEffect(() => {
 		const removeListener = ClashReviewApi.onResultStatusChanged.addListener(
 			(clashTestRuns: any, exitCode: boolean, selectedRunId: string, clashResultData: any) => {
@@ -132,6 +135,8 @@ const ClashRunsWidget = () => {
 			emptyTableContent={"No runs"}
 			density="extra-condensed"
 			style={{ height: "100%" }}
+			subComponent={ClashHistory}
+			onExpand={onExpand}
 		/>
 	);
 };
@@ -157,3 +162,43 @@ export class ClashRunsWidgetProvider implements UiItemsProvider {
 		return widgets;
 	}
 }
+
+const ClashHistory = (row:any) => {
+	const {iTwinId} = useClashContext()
+	const [clashHistory, setClashHistory] = useState([])
+
+	useEffect(() => {
+		const initApp = async () => {
+			const clashHistory = await ClashReviewApi.getClashEvolutionDetails(iTwinId, row.original.id)
+			setClashHistory(clashHistory.rows)
+		}
+
+		initApp()
+	}, [])
+
+	return <div style={{width:"100%"}}>
+		{
+			clashHistory.map((row:any) => (
+				<div key={row.testRunId} >
+					<ExpandableBlock title={new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'medium'}).format(new Date(row.executedAt))} style={{width:"90%", margin:"auto"}}>
+						<span style={{fontSize:"16px"}}><strong>{row.changesetName}</strong></span>
+						<hr />
+						<table style={{width : "100%"}}>
+							<tr>
+								<th style={{textAlign:"center"}}>New</th>
+								<th style={{textAlign:"center"}}>Open</th>
+								<th style={{textAlign:"center"}}>Resolved</th>
+							</tr>
+							<tr>
+								<td style={{textAlign:"center"}}>{row.status.new}</td>
+								<td style={{textAlign:"center"}}>{row.status.open}</td>
+								<td style={{textAlign:"center"}}>{row.status.resolved}</td>
+							</tr>
+						</table>
+					</ExpandableBlock>
+				</div>
+			))
+		}
+	</div>
+}
+

@@ -405,6 +405,18 @@ export default class ClashReviewApi extends HelperMethods {
 		return responseData;
 	}
 
+	public static async getClashEvolutionDetails(projectId: string, reportId: string) {
+		const response = await fetch(`${ClashReviewApi._RAS_BASE_URL}/evolution?reportid=${reportId}`, {
+			headers: {
+				Authorization: ClashReviewApi._accessToken,
+				"itwin-id": projectId,
+			},
+		});
+
+		const responseData = await response.json()
+		return responseData
+	}
+
 	public static visualizeClash(elementAId: string, elementBId: string, isMarkerClick: boolean) {
 		if (!IModelApp.viewManager.selectedView) return;
 
