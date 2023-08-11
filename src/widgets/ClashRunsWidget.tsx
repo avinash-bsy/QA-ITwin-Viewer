@@ -8,6 +8,7 @@ import { StagePanelLocation, StagePanelSection, UiItemsProvider, WidgetState, Wi
 import { Table, DefaultCell, ExpandableBlock } from "@itwin/itwinui-react";
 import { useClashContext } from "../context/ClashContext";
 import ClashReviewApi from "../configs/ClashReviewApi";
+import "./ClashRunsWidget.scss"
 
 interface TableRow extends Record<string, string> {
 	time: string;
@@ -177,28 +178,26 @@ const ClashHistory = (row:any) => {
 	}, [])
 
 	return <div style={{width:"100%"}}>
-		{
-			clashHistory.map((row:any) => (
-				<div key={row.testRunId} >
-					<ExpandableBlock title={new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'medium'}).format(new Date(row.executedAt))} style={{width:"90%", margin:"auto"}}>
-						<span style={{fontSize:"16px"}}><strong>{row.changesetName}</strong></span>
-						<hr />
-						<table style={{width : "100%"}}>
-							<tr>
-								<th style={{textAlign:"center"}}>New</th>
-								<th style={{textAlign:"center"}}>Open</th>
-								<th style={{textAlign:"center"}}>Resolved</th>
-							</tr>
-							<tr>
-								<td style={{textAlign:"center"}}>{row.status.new}</td>
-								<td style={{textAlign:"center"}}>{row.status.open}</td>
-								<td style={{textAlign:"center"}}>{row.status.resolved}</td>
-							</tr>
-						</table>
-					</ExpandableBlock>
-				</div>
-			))
-		}
+		<table style={{width : "100%"}}>
+			<tr>
+				<th>Date Executed</th>
+				<th>Changeset</th>
+				<th>New</th>
+				<th>Open</th>
+				<th>Resolved</th>
+			</tr>
+			{
+				clashHistory.map((row:any) => (
+					<tr>
+						<td>{new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'medium'}).format(new Date(row.executedAt))}</td>
+						<td>{row.changesetName}</td>
+						<td>{row.status.new}</td>
+						<td>{row.status.open}</td>
+						<td>{row.status.resolved}</td>
+					</tr>
+				))
+			}
+		</table>
 	</div>
 }
 
