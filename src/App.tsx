@@ -9,7 +9,7 @@ import { BrowserAuthorizationClient } from "@itwin/browser-authorization";
 import type { ScreenViewport } from "@itwin/core-frontend";
 import { FitViewTool, IModelApp, StandardViewId } from "@itwin/core-frontend";
 import { FillCentered } from "@itwin/core-react";
-import { ProgressLinear } from "@itwin/itwinui-react";
+import { Button, ProgressLinear } from "@itwin/itwinui-react";
 import { MeasureTools, MeasureToolsUiItemsProvider } from "@itwin/measure-tools-react";
 import { PropertyGridManager, PropertyGridUiItemsProvider } from "@itwin/property-grid-react";
 // import { TreeWidget } from "@itwin/tree-widget-react";
@@ -20,7 +20,7 @@ import {
 	ViewerNavigationToolsProvider,
 	ViewerPerformance,
 } from "@itwin/web-viewer-react";
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import { ClashTestsWidgetProvider } from "./widgets/ClashTestsWidget";
 import { ClashRunsWidgetProvider } from "./widgets/ClashRunsWidget";
@@ -30,10 +30,11 @@ import { history } from "./configs/history";
 import ClashReviewApi from "./configs/ClashReviewApi";
 import { useClashContext } from "./context/ClashContext";
 import { CustomNavigationToolsProvider } from "./components/RefreshButton";
+import RegisterNotificationModal from "./components/RegisterNotificationModal";
 
 const App: React.FC = () => {
 	const { iTwinId, iModelId, setIModelId, setITwinId } = useClashContext();
-
+	const [isRegisteryModalOpen, setIsRegisteryModalOpen] = useState(false)
 	const accessToken = useAccessToken();
 
 	const authClient = useMemo(
@@ -146,6 +147,11 @@ const App: React.FC = () => {
 					</div>
 				</FillCentered>
 			)}
+			<Button onClick={() => {
+				setIsRegisteryModalOpen(!isRegisteryModalOpen)
+			}}>
+				Notification
+			</Button>
 			<Viewer
 				iTwinId={iTwinId ?? ""}
 				iModelId={iModelId ?? ""}
@@ -170,6 +176,9 @@ const App: React.FC = () => {
 					new MeasureToolsUiItemsProvider(),
 				]}
 			/>
+			{
+				isRegisteryModalOpen && <RegisterNotificationModal handleModalClose={() => setIsRegisteryModalOpen(false)} modalOpen={isRegisteryModalOpen} />
+			}
 		</div>
 	);
 };

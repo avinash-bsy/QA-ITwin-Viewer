@@ -417,6 +417,44 @@ export default class ClashReviewApi extends HelperMethods {
 		return responseData
 	}
 
+	public static async getNotificationRegisterationDetails() {
+		const response = await fetch(`${ClashReviewApi._RMS_BASE_URL}/registernotification/${process.env.REACT_APP_IMJS_AUTH_CLIENT_CLIENT_ID}`, {
+			headers: {
+				Authorization: ClashReviewApi._accessToken,
+			},
+		})
+
+		const responseData = await response.json()
+		return responseData
+	}
+
+	public static async createNotificationRegistration(data: any) {
+		const response = await fetch(`${ClashReviewApi._RMS_BASE_URL}/registernotification`, {
+			method: "POST",
+			headers: {
+				Authorization: ClashReviewApi._accessToken,
+			},
+			body: JSON.stringify(data)
+		})
+
+		const responseData = await response.json()
+		return responseData
+	}
+
+	public static async updateNotificationRegistration(data: any) {
+		const response = await fetch(`${ClashReviewApi._RMS_BASE_URL}/registernotification/${process.env.REACT_APP_IMJS_AUTH_CLIENT_CLIENT_ID}`, {
+			method: "PUT",
+			headers: {
+				Authorization: ClashReviewApi._accessToken,
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(data)
+		})
+
+		const responseData = await response.json()
+		return responseData
+	}
+
 	public static visualizeClash(elementAId: string, elementBId: string, isMarkerClick: boolean) {
 		if (!IModelApp.viewManager.selectedView) return;
 

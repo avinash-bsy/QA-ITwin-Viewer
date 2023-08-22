@@ -68,8 +68,8 @@ export const convertStringtoObject = (queryReference: string): { [id: string]: A
 		mappingAndGrouppings.forEach((mappingAndGroupping) => {
 			const mappingId = mappingAndGroupping.split(":")[0];
 			const groupingIds = mappingAndGroupping.split(":")[1];
-			const groupingIdsString = groupingIds.substring(1, groupingIds.length - 1);
-			let groupingIdArray = groupingIdsString.split(",");
+			const groupingIdsString = groupingIds?.substring(1, groupingIds.length - 1);
+			let groupingIdArray = groupingIdsString?.split(",");
 
 			responseObject[mappingId] = groupingIdArray;
 		});

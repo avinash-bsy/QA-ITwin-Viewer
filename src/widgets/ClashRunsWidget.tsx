@@ -187,8 +187,8 @@ const ClashHistory = (row:any) => {
 				<th>Resolved</th>
 			</tr>
 			{
-				clashHistory.map((row:any) => (
-					<tr>
+				clashHistory.map((row:any, index:number) => (
+					<tr key={index}>
 						<td>{new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'medium'}).format(new Date(row.executedAt))}</td>
 						<td>{row.changesetName}</td>
 						<td>{row.status.new}</td>

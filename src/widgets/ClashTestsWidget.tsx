@@ -166,9 +166,6 @@ const ClashTestsWidget = () => {
 					onClose={handleOnClose}
 					closeOnEsc
 					closeOnExternalClick
-					// preventDocumentScroll
-					// trapFocus
-					// setFocus
 					isDismissible>
 					<ModalContent method={method} currentTestId={currentTest} />
 				</Modal>
