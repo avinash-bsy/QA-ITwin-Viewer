@@ -7,13 +7,11 @@ import EditSuppressionRule from "./EditSuppressionRule";
 
 interface SuppressionRuleModalProps {
 	handleOnClose: () => void;
-	testDetails: any;
-	setTestDetails: Dispatch<SetStateAction<any>>;
 }
 
 export type PageList = "listRules" | "addRules" | "editRules";
 
-const SuppressionRuleModal: FunctionComponent<SuppressionRuleModalProps> = ({ handleOnClose, testDetails, setTestDetails }) => {
+const SuppressionRuleModal: FunctionComponent<SuppressionRuleModalProps> = ({ handleOnClose}) => {
 	const [currentPage, setCurrentPage] = useState<PageList>("listRules");
 	const [selectedRuleForEdit, setSelectedRuleForEdit] = useState<string>("");
 
@@ -25,8 +23,6 @@ const SuppressionRuleModal: FunctionComponent<SuppressionRuleModalProps> = ({ ha
 						setCurrentPage={setCurrentPage}
 						setSelectedRuleForEdit={setSelectedRuleForEdit}
 						selectedRuleForEdit={selectedRuleForEdit}
-						setTestDetails={setTestDetails}
-						testDetails={testDetails}
 						handleOnClose={handleOnClose}
 					/>
 				);

@@ -1,10 +1,10 @@
 import { Dispatch, FunctionComponent, SetStateAction, useState } from "react";
 import SelectRuleTemplates from "./SelectRuleTemplates";
 import { Button, ModalButtonBar, ModalContent } from "@itwin/itwinui-react";
-import { PageList } from "./SuppressionRulesModal";
+import { PageList } from ".";
 import RuleDetails from "./RuleDetails";
-import ClashReviewApi from "../../configs/ClashReviewApi";
-import { useClashContext } from "../../context/ClashContext";
+import ClashReviewApi from "../../../configs/ClashReviewApi";
+import { useClashContext } from "../../../context/ClashContext";
 import { SvgGoToStart } from "@itwin/itwinui-icons-react";
 
 interface AddSuppressionRuleProps {

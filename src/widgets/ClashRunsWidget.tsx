@@ -5,9 +5,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { actions, ActionType, MetaBase, TableState } from "react-table";
 import { StagePanelLocation, StagePanelSection, UiItemsProvider, WidgetState, Widget } from "@itwin/appui-react";
-import { Table, DefaultCell, ExpandableBlock } from "@itwin/itwinui-react";
+import { Table, DefaultCell, IconButton, ExpandableBlock } from "@itwin/itwinui-react";
 import { useClashContext } from "../context/ClashContext";
 import ClashReviewApi from "../configs/ClashReviewApi";
+import { SvgGoToStart, SvgHistory } from "@itwin/itwinui-icons-react";
 import "./ClashRunsWidget.scss"
 
 interface TableRow extends Record<string, string> {
@@ -17,6 +18,7 @@ interface TableRow extends Record<string, string> {
 
 const ClashRunsWidget = () => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [clashHistory, setClashHistory] = useState([])
 	const { runs, setRuns, setNewRunRequested, setClashResults, runId, testId, setRunId, iTwinId } = useClashContext();
 
 	const getJobStatusText = useCallback((jobStatus: string) => {
@@ -51,12 +53,12 @@ const ClashRunsWidget = () => {
 						accessor: "count",
 					},
 					{
-						Header: "Job-Status",
+						Header: "Status",
 						accessor: "job_status",
 						cellRenderer: (props: any) => (
 							<DefaultCell {...props}>{getJobStatusText(props.cellProps.row.original.job_status)}</DefaultCell>
 						),
-					},
+					}
 				],
 			},
 		],
@@ -90,9 +92,6 @@ const ClashRunsWidget = () => {
 		setIsLoading(false);
 	};
 
-	const onExpand = () => {
-	}
-
 	useEffect(() => {
 		const removeListener = ClashReviewApi.onResultStatusChanged.addListener(
 			(clashTestRuns: any, exitCode: boolean, selectedRunId: string, clashResultData: any) => {
@@ -115,6 +114,16 @@ const ClashRunsWidget = () => {
 		};
 	}, [runId]);
 
+	const onExpand = async (row:any) => {
+		if(row.length === 0)
+		{
+			return
+		}
+		
+		const clashHistory = await ClashReviewApi.getClashEvolutionDetails(iTwinId, row[0].id)
+		setClashHistory(clashHistory.rows)
+	}
+
 	useEffect(() => {
 		if (testId) {
 			getClashRuns();
@@ -123,22 +132,23 @@ const ClashRunsWidget = () => {
 
 	return (
 		<Table<TableRow>
-			data={runs}
-			columns={columnDefinition}
-			onRowClick={onRowClick}
-			isLoading={isLoading}
-			initialState={{
-				selectedRowIds: {
-					0: true,
-				},
-			}}
-			stateReducer={tableStateSingleSelectReducer}
-			emptyTableContent={"No runs"}
-			density="extra-condensed"
-			style={{ height: "100%" }}
-			subComponent={ClashHistory}
-			onExpand={onExpand}
+				data={runs}
+				columns={columnDefinition}
+				onRowClick={onRowClick}
+				isLoading={isLoading}
+				initialState={{
+					selectedRowIds: {
+						0: true,
+					},
+				}}
+				stateReducer={tableStateSingleSelectReducer}
+				emptyTableContent={"No runs"}
+				density="extra-condensed"
+				style={{ height: "100%" }}
+				subComponent={() => ClashHistory(clashHistory)}
+				onExpand={onExpand}
 		/>
+		
 	);
 };
 
@@ -160,34 +170,24 @@ export class ClashRunsWidgetProvider implements UiItemsProvider {
 				content: <ClashRunsWidget />,
 			});
 		}
-		return widgets; 
+		return widgets;
 	}
 }
 
 const ClashHistory = (row:any) => {
-	const {iTwinId} = useClashContext()
-	const [clashHistory, setClashHistory] = useState([])
-
-	useEffect(() => {
-		const initApp = async () => {
-			const clashHistory = await ClashReviewApi.getClashEvolutionDetails(iTwinId, row.original.id)
-			setClashHistory(clashHistory.rows)
-		}
-
-		initApp()
-	}, [])
 
 	return <div style={{width:"100%"}}>
 		<table style={{width : "100%"}}>
-			<tr>
+			<thead>
 				<th>Date Executed</th>
 				<th>Changeset</th>
 				<th>New</th>
 				<th>Open</th>
 				<th>Resolved</th>
-			</tr>
+			</thead>
+			<tbody>
 			{
-				clashHistory.map((row:any, index:number) => (
+				row.map((row:any, index:number) => (
 					<tr key={index}>
 						<td>{new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'medium'}).format(new Date(row.executedAt))}</td>
 						<td>{row.changesetName}</td>
@@ -197,6 +197,7 @@ const ClashHistory = (row:any) => {
 					</tr>
 				))
 			}
+			</tbody>
 		</table>
 	</div>
 }

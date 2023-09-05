@@ -1,8 +1,8 @@
 import { Label, LabeledInput, Select, SelectOption, SelectValueChangeEvent } from "@itwin/itwinui-react";
 import { ChangeEvent, Dispatch, FunctionComponent, SetStateAction, useEffect, useState } from "react";
-import ClashReviewApi from "../../configs/ClashReviewApi";
-import { useClashContext } from "../../context/ClashContext";
-import { convertStringtoObject } from "../ClashDetectionTestModal/useSelectedTestState";
+import ClashReviewApi from "../../../configs/ClashReviewApi";
+import { useClashContext } from "../../../context/ClashContext";
+import { convertStringtoObject } from "..";
 
 interface RuleDetailsProps {
 	setRuleDetails: Dispatch<SetStateAction<Record<string, any>>>;

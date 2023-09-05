@@ -1,7 +1,7 @@
 import { Button, DefaultCell, ExpandableBlock, ModalButtonBar, ModalContent, Table } from "@itwin/itwinui-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import ClashReviewApi from "../../configs/ClashReviewApi";
-import { useClashContext } from "../../context/ClashContext";
+import ClashReviewApi from "../../../configs/ClashReviewApi";
+import { useClashContext } from "../../../context/ClashContext";
 
 const SelectRuleTemplates = ({ setSelectedRuleTemplate, selectedRuleTemplate }: any) => {
 	const [ruleTemplates, setRuleTemplates] = useState<any>([]);

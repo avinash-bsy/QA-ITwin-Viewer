@@ -9,7 +9,7 @@ import { BrowserAuthorizationClient } from "@itwin/browser-authorization";
 import type { ScreenViewport } from "@itwin/core-frontend";
 import { FitViewTool, IModelApp, StandardViewId } from "@itwin/core-frontend";
 import { FillCentered } from "@itwin/core-react";
-import { Button, ProgressLinear } from "@itwin/itwinui-react";
+import { ProgressLinear, Button} from "@itwin/itwinui-react";
 import { MeasureTools, MeasureToolsUiItemsProvider } from "@itwin/measure-tools-react";
 import { PropertyGridManager, PropertyGridUiItemsProvider } from "@itwin/property-grid-react";
 // import { TreeWidget } from "@itwin/tree-widget-react";

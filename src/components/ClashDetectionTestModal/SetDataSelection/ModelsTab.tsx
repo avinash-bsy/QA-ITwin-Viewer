@@ -1,13 +1,13 @@
-import React, { useState } from "react";
 import { Table } from "@itwin/itwinui-react";
+import { FunctionComponent, useCallback } from "react";
 
-interface ModelComponentProps {
+interface ModelsTabProps {
 	selectedModels: Array<string>;
 	modelsList: Array<any>;
 	setSelectedItems: (tab: "models", ids: any) => void;
 }
 
-const ModelsTab = ({ selectedModels, modelsList, setSelectedItems }: ModelComponentProps) => {
+const ModelsTab: FunctionComponent<ModelsTabProps> = ({ selectedModels, modelsList, setSelectedItems }) => {
 	const onSelect = (rows: any): void => {
 		let selectedRows: Array<string> = [];
 
@@ -20,7 +20,7 @@ const ModelsTab = ({ selectedModels, modelsList, setSelectedItems }: ModelCompon
 
 	const getSelectedRows = (): { [id: number]: boolean } => {
 		const selectedRowIds: { [id: number]: boolean } = {};
-		modelsList.map((model: any, index: number) => {
+		modelsList.forEach((model: any, index: number) => {
 			if (selectedModels.includes(model.id)) {
 				selectedRowIds[index] = true;
 			}
@@ -28,6 +28,14 @@ const ModelsTab = ({ selectedModels, modelsList, setSelectedItems }: ModelCompon
 
 		return selectedRowIds;
 	};
+
+	const controlledState = useCallback(
+		(state: any) => {
+			state.selectedRowIds = getSelectedRows();
+		  return { ...state };
+		},
+		[selectedModels]
+	);
 
 	return (
 		<Table
@@ -42,9 +50,7 @@ const ModelsTab = ({ selectedModels, modelsList, setSelectedItems }: ModelCompon
 			emptyTableContent="No data."
 			isSelectable={true}
 			onSelect={onSelect}
-			initialState={{
-				selectedRowIds: getSelectedRows(),
-			}}
+			useControlledState={controlledState}
 			selectionMode="multi"
 		/>
 	);

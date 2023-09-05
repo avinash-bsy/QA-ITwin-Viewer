@@ -1,13 +1,18 @@
-import React, { useMemo } from "react";
 import { Table } from "@itwin/itwinui-react";
+import { FunctionComponent, useCallback, useMemo, useRef } from "react";
+import { TableInstance, TableState } from "react-table";
 
-interface MappingAndGroupingProps {
+interface MappingAndGroupingTabProps {
 	selectedMapAndGroups: Record<string, Array<string>>;
 	mapAndGroupsList: Array<any>;
 	setSelectedItems: (tab: "mappingAndGroupings", ids: any) => void;
 }
 
-const MappingAndGroupingTab = ({ selectedMapAndGroups, mapAndGroupsList, setSelectedItems }: MappingAndGroupingProps) => {
+const MappingAndGroupingTab: FunctionComponent<MappingAndGroupingTabProps> = ({
+	selectedMapAndGroups,
+	mapAndGroupsList,
+	setSelectedItems,
+}) => {
 	const onSelect = (rows: any): void => {
 		let selectedRows: { [id: string]: Array<string> } = {};
 
@@ -68,20 +73,24 @@ const MappingAndGroupingTab = ({ selectedMapAndGroups, mapAndGroupsList, setSele
 		[]
 	);
 
+	const controlledState = useCallback(
+		(state: any) => {
+			state.selectedRowIds = getSelectedRows();
+		  return { ...state };
+		},
+		[selectedMapAndGroups]
+	);
+
 	return (
-		<>
-			<Table
-				emptyTableContent="No data."
-				isSelectable
-				isSortable
-				data={mapAndGroupsList}
-				columns={columns}
-				initialState={{
-					selectedRowIds: getSelectedRows(),
-				}}
-				onSelect={onSelect}
-			/>
-		</>
+		<Table
+			emptyTableContent="No data."
+			isSelectable
+			isSortable
+			data={mapAndGroupsList}
+			columns={columns}
+			useControlledState={controlledState}
+			onSelect={onSelect}
+		/>
 	);
 };
 

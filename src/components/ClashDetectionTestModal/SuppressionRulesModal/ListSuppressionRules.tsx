@@ -1,16 +1,15 @@
 import { SvgAdd, SvgEdit } from "@itwin/itwinui-icons-react";
 import { Button, ButtonGroup, IconButton, ModalButtonBar, ModalContent, Table } from "@itwin/itwinui-react";
 import { Dispatch, FunctionComponent, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
-import { PageList } from "./SuppressionRulesModal";
-import ClashReviewApi from "../../configs/ClashReviewApi";
-import { useClashContext } from "../../context/ClashContext";
+import { PageList } from ".";
+import ClashReviewApi from "../../../configs/ClashReviewApi";
+import { useClashContext } from "../../../context/ClashContext";
+import { useClashDetectionTestContext } from "../../../context/ClashDetectionTestContext";
 
 interface ListSuppressionRulesProps {
 	setCurrentPage: Dispatch<SetStateAction<PageList>>;
 	setSelectedRuleForEdit: Dispatch<SetStateAction<string>>;
 	selectedRuleForEdit: string;
-	testDetails: any;
-	setTestDetails: Dispatch<SetStateAction<any>>;
 	handleOnClose: () => void;
 }
 
@@ -18,8 +17,6 @@ const ListSuppressionRules: FunctionComponent<ListSuppressionRulesProps> = ({
 	setCurrentPage,
 	setSelectedRuleForEdit,
 	selectedRuleForEdit,
-	testDetails,
-	setTestDetails,
 	handleOnClose,
 }) => {
 	const [suppressionRules, setSuppressionRules] = useState([]);
@@ -28,6 +25,7 @@ const ListSuppressionRules: FunctionComponent<ListSuppressionRulesProps> = ({
 	const [editButtonDisabled, setEditButtonDisabled] = useState(true);
 	const [selectedRules, setSelectedRules] = useState([]);
 	const { iTwinId } = useClashContext();
+	const {setTestDetails, testDetails} = useClashDetectionTestContext()
 
 	const columnDefinition = useMemo(
 		() => [
