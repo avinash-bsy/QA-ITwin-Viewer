@@ -9,7 +9,7 @@ import { BrowserAuthorizationClient } from "@itwin/browser-authorization";
 import type { ScreenViewport } from "@itwin/core-frontend";
 import { FitViewTool, IModelApp, StandardViewId } from "@itwin/core-frontend";
 import { FillCentered } from "@itwin/core-react";
-import { ProgressLinear, Button} from "@itwin/itwinui-react";
+import { ProgressLinear, Button, DropdownMenu, IconButton, MenuItem} from "@itwin/itwinui-react";
 import { MeasureTools, MeasureToolsUiItemsProvider } from "@itwin/measure-tools-react";
 import { PropertyGridManager, PropertyGridUiItemsProvider } from "@itwin/property-grid-react";
 // import { TreeWidget } from "@itwin/tree-widget-react";
@@ -31,6 +31,7 @@ import ClashReviewApi from "./configs/ClashReviewApi";
 import { useClashContext } from "./context/ClashContext";
 import { CustomNavigationToolsProvider } from "./components/RefreshButton";
 import RegisterNotificationModal from "./components/RegisterNotificationModal";
+import { SvgMore, SvgSettings } from "@itwin/itwinui-icons-react";
 
 const App: React.FC = () => {
 	const { iTwinId, iModelId, setIModelId, setITwinId } = useClashContext();
@@ -138,6 +139,13 @@ const App: React.FC = () => {
 		await MeasureTools.startup();
 	}, []);
 
+	const dropdownMenuItems = (close: () => void) => [<MenuItem key={1} onClick={() => {
+		setIsRegisteryModalOpen(true)
+		close()
+	}}>
+		Notification Registration
+	  </MenuItem>]
+
 	return (
 		<div className="viewer-container">
 			{!accessToken && (
@@ -147,11 +155,13 @@ const App: React.FC = () => {
 					</div>
 				</FillCentered>
 			)}
-			<Button onClick={() => {
-				setIsRegisteryModalOpen(!isRegisteryModalOpen)
-			}}>
-				Notification
-			</Button>
+			<div style={{float:"right"}}>
+				<DropdownMenu menuItems={dropdownMenuItems}>
+					<IconButton style={{background:"none", border:"none"}}>
+						<SvgSettings />
+					</IconButton>
+				</DropdownMenu>
+			</div>
 			<Viewer
 				iTwinId={iTwinId ?? ""}
 				iModelId={iModelId ?? ""}
