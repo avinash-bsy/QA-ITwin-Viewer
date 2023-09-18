@@ -74,7 +74,7 @@ const ClashDetectionTestModal: FunctionComponent<ClashDetectionTestModalProps> =
 			if(response.errorMessage)
 				alert(response.errorMessage)
 			else
-				alert("Test updated successfully")
+				alert("Test created successfully")
 		} catch (error) {
 			console.log(error)
 		}
