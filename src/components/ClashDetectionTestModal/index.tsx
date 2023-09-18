@@ -20,12 +20,12 @@ export const convertStringtoObject = (queryReference: string): { [id: string]: A
 		let responseObject: { [id: string]: Array<string> } = {};
 		const mappingAndGrouppings = queryReference.split(";");
 		mappingAndGrouppings.forEach((mappingAndGroupping) => {
-			const mappingId = mappingAndGroupping.split(":")[0];
-			const groupingIds = mappingAndGroupping.split(":")[1];
-			const groupingIdsString = groupingIds.substring(1, groupingIds.length - 1);
-			let groupingIdArray = groupingIdsString.split(",");
+			const mappingId = mappingAndGroupping?.split(":")[0];
+			const groupingIds = mappingAndGroupping?.split(":")[1];
+			const groupingIdsString = groupingIds?.substring(1, groupingIds.length - 1);
+			let groupingIdArray = groupingIdsString?.split(",");
 
-			responseObject[mappingId] = groupingIdArray;
+			responseObject[mappingId] = groupingIdArray || [];
 		});
 
 		return responseObject;
@@ -34,22 +34,27 @@ export const convertStringtoObject = (queryReference: string): { [id: string]: A
 	}
 };
 
-export const formatQueryReference = (mappingAndGroupings: Record<string, Array<string>> | undefined): string => {
+const formatQueryReference = (mappingAndGroupings: Record<string, Array<string>> | undefined): string => {
 	let queryReference = "";
 	if (mappingAndGroupings) {
-		Object.entries(mappingAndGroupings).map(([mappingId, groupingIds]: [string, Array<string>], index) => {
-			queryReference += mappingId + ":[";
-			groupingIds.forEach((groupingId: string, idx: number) => {
+	    const mappingIds = Object.keys(mappingAndGroupings)
+	    const groupingIds = Object.values(mappingAndGroupings)
+	    
+	    mappingIds.map((mappingId, index) => {
+	        const groupIds = groupingIds[index]
+	        
+	        queryReference += mappingId + ":[";
+			groupIds.forEach((groupingId, idx) => {
 				queryReference += groupingId;
-				if (idx !== groupingIds.length - 1) {
+				if (idx !== groupIds.length - 1) {
 					queryReference += ",";
 				}
 			});
 			queryReference += "]";
-			if (index !== groupingIds.length - 1) {
+			if (index !== mappingIds.length - 1) {
 				queryReference += ";";
 			}
-		});
+	    })
 	}
 	return queryReference;
 };
@@ -66,8 +71,10 @@ const ClashDetectionTestModal: FunctionComponent<ClashDetectionTestModalProps> =
 			addSetData()
 
 			const response = await ClashReviewApi.createClashDetectionTest(iTwinId, testDetails)
-			console.log(response)
-			alert("Test created successfully")
+			if(response.errorMessage)
+				alert(response.errorMessage)
+			else
+				alert("Test updated successfully")
 		} catch (error) {
 			console.log(error)
 		}
@@ -78,8 +85,23 @@ const ClashDetectionTestModal: FunctionComponent<ClashDetectionTestModalProps> =
 		
 	};
 
-	const updateClashDetectionTest = () => {
-		alert("update clash test");
+	const updateClashDetectionTest = async () => {
+		try {
+			setLoading(true)
+			addSetData()
+
+			const response = await ClashReviewApi.updateClashDetectionTest(iTwinId, iTwinId, testDetails)
+			if(response.errorMessage)
+				alert(response.errorMessage)
+			else
+				alert("Test updated successfully")
+		} catch (error) {
+			console.log(error)
+		}
+		finally
+		{
+			setLoading(false)
+		}
 	};
 
 	const actionHandler = () => {
