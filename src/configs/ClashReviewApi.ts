@@ -220,6 +220,7 @@ export default class ClashReviewApi extends HelperMethods {
 				headers: {
 					accept: "application/json",
 					"itwin-id": projectId,
+					"pagesize": "100",
 					Authorization: ClashReviewApi._accessToken,
 				},
 			});
