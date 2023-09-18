@@ -178,8 +178,17 @@ export default class ClashReviewApi extends HelperMethods {
 			}
 		);
 
-		const parsedResponse = await response.json();
-		return parsedResponse;
+		if(response.status >= 200 && response.status <= 300)
+		{
+			const parsedResponse = await response.json();
+			return parsedResponse;
+		}
+		else
+		{
+			const error = await response.text()
+			console.log(error)
+			throw new Error(error)
+		}
 	}
 
 	public static async createClashDetectionTest(projectId: string, data: any) {
@@ -192,8 +201,17 @@ export default class ClashReviewApi extends HelperMethods {
 			body: JSON.stringify([data]),
 		});
 
-		const parsedResponse = await response.json();
-		return parsedResponse;
+		if(response.status >= 200 && response.status <= 300)
+		{
+			const parsedResponse = await response.json();
+			return parsedResponse;
+		}
+		else
+		{
+			const error = await response.text()
+			console.log(error)
+			throw new Error(error)
+		}
 	}
 
 	public static async getClashRuns(projectId: string, testId: string): Promise<any> {

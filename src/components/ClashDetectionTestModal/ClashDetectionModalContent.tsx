@@ -37,39 +37,50 @@ const ClashDetectionModalContent = ({ method, currentTestId }: ModalContentProps
 	}, [testDetails]);
 
 	const createClashDetectionTest = async () => {
-		addSetData();
-		testDetails.configType = 2;
-		testDetails.includeSubModels = true;
-		testDetails.advancedSettings = {
-			...testDetails.advancedSettings,
-			longClash: true,
-			calculateOverlap: true,
-			toleranceOverlapValidation: testDetails.advancedSettings?.toleranceOverlapValidation || false,
-		};
-		testDetails.suppressTouching = testDetails.suppressTouching || false;
-		testDetails.touchingTolerance = testDetails.touchingTolerance || 0;
-		const response = await ClashReviewApi.createClashDetectionTest(iTwinId, testDetails);
-		console.log(response);
-		setTestDetails({ ...testDetails });
-		alert("test created");
+		try {
+			addSetData();
+			testDetails.configType = 2;
+			testDetails.includeSubModels = true;
+			testDetails.advancedSettings = {
+				...testDetails.advancedSettings,
+				longClash: true,
+				calculateOverlap: true,
+				toleranceOverlapValidation: testDetails.advancedSettings?.toleranceOverlapValidation || false,
+			};
+			testDetails.suppressTouching = testDetails.suppressTouching || false;
+			testDetails.touchingTolerance = testDetails.touchingTolerance || 0;
+			const response = await ClashReviewApi.createClashDetectionTest(iTwinId, testDetails);
+			console.log(response);
+			setTestDetails({ ...testDetails });
+			alert("test created");
+		} catch (error) {
+			console.log(error)
+			alert("Something went wrong!")
+		}
+		
 	};
 
-	const formatQueryReference = (mappingAndGroupings: Record<string, Array<string>>): string => {
+	const formatQueryReference = (mappingAndGroupings: Record<string, Array<string>> | undefined): string => {
 		let queryReference = "";
 		if (mappingAndGroupings) {
-			Object.entries(mappingAndGroupings).map(([mappingId, groupingIds]: [string, Array<string>], index) => {
+			const mappingIds = Object.keys(mappingAndGroupings)
+			const groupingIds = Object.values(mappingAndGroupings)
+			
+			mappingIds.map((mappingId, index) => {
+				const groupIds = groupingIds[index]
+				
 				queryReference += mappingId + ":[";
-				groupingIds.forEach((groupingId: string, idx: number) => {
+				groupIds.forEach((groupingId, idx) => {
 					queryReference += groupingId;
-					if (idx !== groupingIds.length - 1) {
+					if (idx !== groupIds.length - 1) {
 						queryReference += ",";
 					}
 				});
 				queryReference += "]";
-				if (index !== groupingIds.length - 1) {
+				if (index !== mappingIds.length - 1) {
 					queryReference += ";";
 				}
-			});
+			})
 		}
 		return queryReference;
 	};
@@ -164,21 +175,26 @@ const ClashDetectionModalContent = ({ method, currentTestId }: ModalContentProps
 	};
 
 	const updateClashDetectionTest = async () => {
-		addSetData();
+		try {
+			addSetData();
 
-		if (testDetails.tag) {
-			testDetails.tag = {
-				repositoryId: testDetails.tag?.id,
-				repositoryType: testDetails.tag?.type,
-			};
-		} else {
-			delete testDetails.tag;
+			if (testDetails.tag) {
+				testDetails.tag = {
+					repositoryId: testDetails.tag?.id,
+					repositoryType: testDetails.tag?.type,
+				};
+			} else {
+				delete testDetails.tag;
+			}
+
+			const { contextId, createdBy, creationDate, id, lastModifiedBy, modificationDate, ...requiredData } = testDetails;
+
+			await ClashReviewApi.updateClashDetectionTest(iTwinId, currentTestId!, requiredData);
+			alert("Test updated successfully");
+		} catch (error) {
+			console.log(error)
+			alert('Something went wrong!')
 		}
-
-		const { contextId, createdBy, creationDate, id, lastModifiedBy, modificationDate, ...requiredData } = testDetails;
-
-		await ClashReviewApi.updateClashDetectionTest(iTwinId, currentTestId!, requiredData);
-		alert("Test updated successfully");
 	};
 
 	useEffect(() => {
