@@ -136,6 +136,28 @@ export default class ClashReviewApi extends HelperMethods {
 		}
 	}
 
+	private static async getAllSuppressionRules(projectId: string, continuationToken: string) {
+		const response = await fetch(`${ClashReviewApi._RMS_BASE_URL}/contexts/${projectId}/suppressionrules`, {
+			headers: {
+				"Include-User-Metadata": "true",
+				Authorization: ClashReviewApi._accessToken,
+				continuationToken: continuationToken,
+				pageSize: "50",
+				accept: "application/json",
+			},
+		});
+
+		const responseData = await response.json();
+
+		if (responseData.hasMoreData) {
+			const data = await ClashReviewApi.getAllSuppressionRules(projectId, responseData.continuationToken);
+			responseData.rows = [...responseData.rows, ...data.rows];
+			return responseData;
+		} else {
+			return responseData;
+		}
+	}
+
 	public static async getClashTests(projectId: string): Promise<any> {
 		const response = await fetch(`${ClashReviewApi._RMS_BASE_URL}/contexts/${projectId}/tests`, {
 			headers: {
@@ -345,15 +367,8 @@ export default class ClashReviewApi extends HelperMethods {
 	}
 
 	public static async getSuppressionRules(projectId: string) {
-		const response = await fetch(`${ClashReviewApi._RMS_BASE_URL}/contexts/${projectId}/suppressionrules`, {
-			headers: {
-				"Include-User-Metadata": "true",
-				Authorization: ClashReviewApi._accessToken,
-			},
-		});
-
-		const dataRows = await response.json();
-		const filteredRows = dataRows.rows.filter((row: any) => row.templateId === "95d3e23f-e175-4979-b128-fff03fa231e3");
+		const response = await ClashReviewApi.getAllSuppressionRules(projectId, "")
+		const filteredRows = response.rows.filter((row: any) => ["1d9e0843-94bd-44fe-b357-0a2accef1717", "cc9ebab1-c684-4500-b588-73445d09391b", "e4176170-583f-4d27-997e-2149d16a87d0", "95d3e23f-e175-4979-b128-fff03fa231e3"].includes(row.templateId));
 
 		return filteredRows;
 	}

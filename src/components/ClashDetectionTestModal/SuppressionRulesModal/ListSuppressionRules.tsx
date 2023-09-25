@@ -1,24 +1,18 @@
-import { SvgAdd, SvgEdit } from "@itwin/itwinui-icons-react";
+import { SvgAdd, SvgEdit, SvgGoToStart } from "@itwin/itwinui-icons-react";
 import { Button, ButtonGroup, IconButton, ModalButtonBar, ModalContent, Table } from "@itwin/itwinui-react";
 import { Dispatch, FunctionComponent, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
-import { PageList } from ".";
 import ClashReviewApi from "../../../configs/ClashReviewApi";
 import { useClashContext } from "../../../context/ClashContext";
 import { useClashDetectionTestContext } from "../../../context/ClashDetectionTestContext";
+import { useSuppressionModalContext } from "../../../context/SuppressionModalContext";
 
 interface ListSuppressionRulesProps {
-	setCurrentPage: Dispatch<SetStateAction<PageList>>;
-	setSelectedRuleForEdit: Dispatch<SetStateAction<string>>;
-	selectedRuleForEdit: string;
 	handleOnClose: () => void;
+	setSelectedRuleForEdit: Dispatch<SetStateAction<null | string>>;
+	selectedRuleForEdit: null | string;
 }
 
-const ListSuppressionRules: FunctionComponent<ListSuppressionRulesProps> = ({
-	setCurrentPage,
-	setSelectedRuleForEdit,
-	selectedRuleForEdit,
-	handleOnClose,
-}) => {
+const ListSuppressionRules: FunctionComponent<ListSuppressionRulesProps> = ({handleOnClose, setSelectedRuleForEdit, selectedRuleForEdit}) => {
 	const [suppressionRules, setSuppressionRules] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [addButtonDisabled, setAddButtonDisabled] = useState(false);
@@ -26,6 +20,7 @@ const ListSuppressionRules: FunctionComponent<ListSuppressionRulesProps> = ({
 	const [selectedRules, setSelectedRules] = useState([]);
 	const { iTwinId } = useClashContext();
 	const {setTestDetails, testDetails} = useClashDetectionTestContext()
+	const {currentPage, setCurrentPage} = useSuppressionModalContext()
 
 	const columnDefinition = useMemo(
 		() => [
@@ -59,32 +54,16 @@ const ListSuppressionRules: FunctionComponent<ListSuppressionRulesProps> = ({
 	);
 
 	const handleSelect = (rows: any, state: any) => {
-		// if (rows.length === 0) {
-		// 	setAddButtonDisabled(false);
-		// 	setEditButtonDisabled(true);
-		// 	return;
-		// }
-		// setAddButtonDisabled(true);
-		// if (rows.length === 1) {
-		// 	setSelectedRuleForEdit(rows[0].id);
-		// 	setEditButtonDisabled(false);
-		// 	return;
-		// }
-
-		// setSelectedRuleForEdit("");
-		// setEditButtonDisabled(true);
-		// console.log(rows);
-		// setSelectedRules(rows);
-
 		if (rows.length === 0) {
 			setAddButtonDisabled(false);
+			setSelectedRuleForEdit(null);
 			setEditButtonDisabled(true);
 		} else if (rows.length === 1) {
 			setSelectedRuleForEdit(rows[0].id);
 			setEditButtonDisabled(false);
 			setAddButtonDisabled(true);
 		} else {
-			setSelectedRuleForEdit("");
+			setSelectedRuleForEdit(null);
 			setEditButtonDisabled(true);
 		}
 
@@ -137,14 +116,14 @@ const ListSuppressionRules: FunctionComponent<ListSuppressionRulesProps> = ({
 					<ButtonGroup style={{ float: "right" }}>
 						<IconButton
 							onClick={() => {
-								setCurrentPage("addRules");
+								setCurrentPage("selectRuleType");
 							}}
 							disabled={addButtonDisabled}>
 							<SvgAdd />
 						</IconButton>
 						<IconButton
 							onClick={() => {
-								setCurrentPage("editRules");
+								setCurrentPage("ruleDetails");
 							}}
 							disabled={editButtonDisabled}>
 							<SvgEdit />

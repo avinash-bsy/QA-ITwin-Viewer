@@ -8,6 +8,7 @@ import ClashReviewApi from "../../configs/ClashReviewApi";
 import { useClashContext } from "../../context/ClashContext";
 import AdvancedOption from "./AdvancedOptions";
 import SuppressionRuleModal from "./SuppressionRulesModal";
+import { SuppressionModalContextProvider } from "../../context/SuppressionModalContext";
 
 interface ClashDetectionTestModalProps {
 	method: "create" | "update";
@@ -156,7 +157,9 @@ const ClashDetectionTestModal: FunctionComponent<ClashDetectionTestModalProps> =
 			case "setSelection" :
 				return <SetDataSelection selectedDataItems={selectedDataItems} setSelectedDataItems={setSelectedDataItems}/>
 			case "suppressionRules" :
-				return <SuppressionRuleModal handleOnClose={handleSuppressionModalClose}/>
+				return <SuppressionModalContextProvider>
+					<SuppressionRuleModal handleOnClose={handleSuppressionModalClose}/>
+				</SuppressionModalContextProvider>
 		}
 	}
 
@@ -201,10 +204,6 @@ const ClashDetectionTestModal: FunctionComponent<ClashDetectionTestModalProps> =
 			)
 		}
 	}, []);
-
-	useEffect(() => {
-		console.log(selectedDataItems)
-	}, [selectedDataItems])
 
 	return (
 		<Modal
