@@ -37,53 +37,63 @@ const BothAspectProperties: FunctionComponent<BothAspectPropertiesProps> = ({rul
     }
 
 	const updateSuppressionRule = async () => {
-		const requestBody = {
-			name: ruleDetails.name,
-			reason: ruleDetails.reason,
-			parameters: {
-				propertyExpression1: {
-                    operator : ruleDetails.operator,
-                    propertyName: ruleDetails.propertyName,
-                    propertyValue: ruleDetails.propertyValue,
-                    relationshipPath: ruleDetails.relationshipPath
+        try {
+            const requestBody = {
+                name: ruleDetails.name,
+                reason: ruleDetails.reason,
+                parameters: {
+                    propertyExpression1: {
+                        operator : ruleDetails.operator,
+                        propertyName: ruleDetails.propertyName,
+                        propertyValue: ruleDetails.propertyValue,
+                        relationshipPath: ruleDetails.relationshipPath
+                    },
+                    propertyExpression2: {
+                        operator : ruleDetails.operator2,
+                        propertyName: ruleDetails.propertyName2,
+                        propertyValue: ruleDetails.propertyValue2,
+                        relationshipPath: ruleDetails.relationshipPath2
+                    }
                 },
-				propertyExpression2: {
-                    operator : ruleDetails.operator2,
-                    propertyName: ruleDetails.propertyName2,
-                    propertyValue: ruleDetails.propertyValue2,
-                    relationshipPath: ruleDetails.relationshipPath2
-                }
-			},
-		};
+            };
+    
+            await ClashReviewApi.updateSuppressionRule(iTwinId, ruleDetails.id, requestBody);
+            alert("Suppression rule updated successfully")
+        } catch (error) {
+            console.log(error)
+            alert("Something went wrong!")
+        }
 
-		await ClashReviewApi.updateSuppressionRule(iTwinId, ruleDetails.id, requestBody);
 	};
 
 	const addSuppressionRule = async () => {
-		const requestBody = {
-			templateId: selectedRuleTemplate.id,
-			name: ruleDetails.name,
-			reason: ruleDetails.reason,
-			parameters: {
-				propertyExpression1: {
-                    operator : ruleDetails.operator,
-                    propertyName: ruleDetails.propertyName,
-                    propertyValue: ruleDetails.propertyValue,
-                    relationshipPath: ruleDetails.relationshipPath
+        try {
+            const requestBody = {
+                templateId: selectedRuleTemplate.id,
+                name: ruleDetails.name,
+                reason: ruleDetails.reason,
+                parameters: {
+                    propertyExpression1: {
+                        operator : ruleDetails.operator,
+                        propertyName: ruleDetails.propertyName,
+                        propertyValue: ruleDetails.propertyValue,
+                        relationshipPath: ruleDetails.relationshipPath
+                    },
+                    propertyExpression2: {
+                        operator : ruleDetails.operator2,
+                        propertyName: ruleDetails.propertyName2,
+                        propertyValue: ruleDetails.propertyValue2,
+                        relationshipPath: ruleDetails.relationshipPath2
+                    }
                 },
-				propertyExpression2: {
-                    operator : ruleDetails.operator2,
-                    propertyName: ruleDetails.propertyName2,
-                    propertyValue: ruleDetails.propertyValue2,
-                    relationshipPath: ruleDetails.relationshipPath2
-                }
-			},
-		};
+            };
 
-        console.log(requestBody)
-        // return
-		const response = await ClashReviewApi.createSuppressionRule(iTwinId, requestBody);
-		console.log(response);
+            await ClashReviewApi.createSuppressionRule(iTwinId, requestBody);
+            alert("Suppression rule created successfully")
+        } catch (error) {
+            console.log(error)
+            alert("Something went wrong!")
+        }
 	};
 
 	useEffect(() => {

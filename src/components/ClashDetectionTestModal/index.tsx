@@ -71,13 +71,11 @@ const ClashDetectionTestModal: FunctionComponent<ClashDetectionTestModalProps> =
 			setLoading(true)
 			addSetData()
 
-			const response = await ClashReviewApi.createClashDetectionTest(iTwinId, testDetails)
-			if(response.errorMessage)
-				alert(response.errorMessage)
-			else
-				alert("Test created successfully")
+			await ClashReviewApi.createClashDetectionTest(iTwinId, testDetails)
+			alert("Clash detection test updated successfully")
 		} catch (error) {
 			console.log(error)
+			alert("Something went wrong!")
 		}
 		finally
 		{
@@ -91,13 +89,11 @@ const ClashDetectionTestModal: FunctionComponent<ClashDetectionTestModalProps> =
 			setLoading(true)
 			addSetData()
 
-			const response = await ClashReviewApi.updateClashDetectionTest(iTwinId, iTwinId, testDetails)
-			if(response.errorMessage)
-				alert(response.errorMessage)
-			else
-				alert("Test updated successfully")
+			await ClashReviewApi.updateClashDetectionTest(iTwinId, iTwinId, testDetails)
+			alert("Clash detection test updated successfully")
 		} catch (error) {
 			console.log(error)
+			alert("Something went wrong!")
 		}
 		finally
 		{

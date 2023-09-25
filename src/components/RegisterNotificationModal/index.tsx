@@ -33,7 +33,6 @@ const RegisterNotificationModal: FunctionComponent<RegisterNotificationModalProp
         } catch (error) {
             console.log(error)
         }
-        
     }
 
     const handleNotificationRegistrationUpdate = async () => {

@@ -37,39 +37,53 @@ const AnyAspectProperty: FunctionComponent<AnyAspectPropertyProps> = ({ruleData}
     }
 
 	const updateSuppressionRule = async () => {
-		const requestBody = {
-			name: ruleDetails.name,
-			reason: ruleDetails.reason,
-			parameters: {
-				propertyExpression: {
-                    operator : ruleDetails.operator,
-                    propertyName: ruleDetails.propertyName,
-                    propertyValue: ruleDetails.propertyValue,
-                    relationshipPath: ruleDetails.relationshipPath
-                }
-			},
-		};
+		try {
+			const requestBody = {
+				name: ruleDetails.name,
+				reason: ruleDetails.reason,
+				parameters: {
+					propertyExpression: {
+						operator : ruleDetails.operator,
+						propertyName: ruleDetails.propertyName,
+						propertyValue: ruleDetails.propertyValue,
+						relationshipPath: ruleDetails.relationshipPath
+					}
+				},
+			};
+	
+			await ClashReviewApi.updateSuppressionRule(iTwinId, ruleDetails.id, requestBody);
 
-		await ClashReviewApi.updateSuppressionRule(iTwinId, ruleDetails.id, requestBody);
+			alert("Suppression rule updated successfully")
+		} catch (error) {
+			console.log(error)
+			alert("Something went wrong!")
+		}
+		
 	};
 
 	const addSuppressionRule = async () => {
-		const requestBody = {
-			templateId: selectedRuleTemplate.id,
-			name: ruleDetails.name,
-			reason: ruleDetails.reason,
-			parameters: {
-				propertyExpression: {
-                    operator : ruleDetails.operator,
-                    propertyName: ruleDetails.propertyName,
-                    propertyValue: ruleDetails.propertyValue,
-                    relationshipPath: ruleDetails.relationshipPath
-                }
-			},
-		};
-
-		const response = await ClashReviewApi.createSuppressionRule(iTwinId, requestBody);
-		console.log(response);
+		try {
+			const requestBody = {
+				templateId: selectedRuleTemplate.id,
+				name: ruleDetails.name,
+				reason: ruleDetails.reason,
+				parameters: {
+					propertyExpression: {
+						operator : ruleDetails.operator,
+						propertyName: ruleDetails.propertyName,
+						propertyValue: ruleDetails.propertyValue,
+						relationshipPath: ruleDetails.relationshipPath
+					}
+				},
+			};
+	
+			await ClashReviewApi.createSuppressionRule(iTwinId, requestBody);
+			alert("Suppression rule created successfully")
+		} catch (error) {
+			console.log(error)
+			alert("Something went wrong!")
+		}
+		
 	};
 
 	useEffect(() => {

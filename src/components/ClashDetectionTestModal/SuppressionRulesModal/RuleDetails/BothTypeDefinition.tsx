@@ -37,20 +37,27 @@ const BothTypeDefition: FunctionComponent<BothTypeDefinitionProps> = ({ruleData}
     }
 
 	const updateSuppressionRule = async () => {
-		const requestBody = {
-			name: ruleDetails.name,
-			reason: ruleDetails.reason,
-			parameters: {
-				likeExpression1: {
-					value : ruleDetails.likeExpression1
+		try {
+			const requestBody = {
+				name: ruleDetails.name,
+				reason: ruleDetails.reason,
+				parameters: {
+					likeExpression1: {
+						value : ruleDetails.likeExpression1
+					},
+					likeExpression2: {
+						value : ruleDetails.likeExpression2
+					}
 				},
-				likeExpression2: {
-					value : ruleDetails.likeExpression2
-				}
-			},
-		};
-
-		await ClashReviewApi.updateSuppressionRule(iTwinId, ruleDetails.id, requestBody);
+			};
+	
+			await ClashReviewApi.updateSuppressionRule(iTwinId, ruleDetails.id, requestBody);
+			alert("Suppression rule updated successfully")
+		} catch (error) {
+			console.log(error)
+			alert("Something went wrong!")
+		}
+		
 	};
 
 	const addSuppressionRule = async () => {

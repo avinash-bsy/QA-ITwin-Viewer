@@ -200,8 +200,17 @@ export default class ClashReviewApi extends HelperMethods {
 			}
 		);
 
-		const parsedResponse = await response.json();
-		return parsedResponse;
+		if(response.status >= 200 && response.status <= 300)
+		{
+			const parsedResponse = await response.json();
+			return parsedResponse;
+		}
+		else
+		{
+			const error = await response.text()
+			console.log(error)
+			throw new Error(error)
+		}
 	}
 
 	public static async createClashDetectionTest(projectId: string, data: any) {
@@ -214,8 +223,17 @@ export default class ClashReviewApi extends HelperMethods {
 			body: JSON.stringify([data]),
 		});
 
-		const parsedResponse = await response.json();
-		return parsedResponse;
+		if(response.status >= 200 && response.status <= 300)
+		{
+			const parsedResponse = await response.json();
+			return parsedResponse;
+		}
+		else
+		{
+			const error = await response.text()
+			console.log(error)
+			throw new Error(error)
+		}
 	}
 
 	public static async getClashRuns(projectId: string, testId: string): Promise<any> {
@@ -391,8 +409,17 @@ export default class ClashReviewApi extends HelperMethods {
 			body: JSON.stringify(body),
 		});
 
-		const responseData = await response.json();
-		return responseData;
+		if(response.status >= 200 && response.status <= 300)
+		{
+			const parsedResponse = await response.json();
+			return parsedResponse;
+		}
+		else
+		{
+			const error = await response.text()
+			console.log(error)
+			throw new Error(error)
+		}
 	}
 
 	public static async updateSuppressionRule(projectId: string, ruleId: string, body: any) {
@@ -405,8 +432,17 @@ export default class ClashReviewApi extends HelperMethods {
 			body: JSON.stringify(body),
 		});
 
-		const responseData = await response.json();
-		return responseData;
+		if(response.status >= 200 && response.status <= 300)
+		{
+			const parsedResponse = await response.json();
+			return parsedResponse;
+		}
+		else
+		{
+			const error = await response.text()
+			console.log(error)
+			throw new Error(error)
+		}
 	}
 
 	public static async getSuppressionRuleDetailsById(projectId: string, ruleId: string) {
@@ -452,8 +488,17 @@ export default class ClashReviewApi extends HelperMethods {
 			body: JSON.stringify(data)
 		})
 
-		const responseData = await response.json()
-		return responseData
+		if(response.status >= 200 && response.status <= 300)
+		{
+			const parsedResponse = await response.json();
+			return parsedResponse;
+		}
+		else
+		{
+			const error = await response.text()
+			console.log(error)
+			throw new Error(error)
+		}
 	}
 
 	public static async updateNotificationRegistration(data: any) {
@@ -466,8 +511,17 @@ export default class ClashReviewApi extends HelperMethods {
 			body: JSON.stringify(data)
 		})
 
-		const responseData = await response.json()
-		return responseData
+		if(response.status >= 200 && response.status <= 300)
+		{
+			const parsedResponse = await response.json();
+			return parsedResponse;
+		}
+		else
+		{
+			const error = await response.text()
+			console.log(error)
+			throw new Error(error)
+		}
 	}
 
 	public static visualizeClash(elementAId: string, elementBId: string, isMarkerClick: boolean) {

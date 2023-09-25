@@ -37,41 +37,53 @@ const CompareAspectProperties: FunctionComponent<CompareAspectPropertiesProps> =
     }
 
 	const updateSuppressionRule = async () => {
-		const requestBody = {
-			name: ruleDetails.name,
-			reason: ruleDetails.reason,
-			parameters: {
-				operator: {
-					value : ruleDetails.operator
+		try {
+			const requestBody = {
+				name: ruleDetails.name,
+				reason: ruleDetails.reason,
+				parameters: {
+					operator: {
+						value : ruleDetails.operator
+					},
+					propertyKey : {
+						propertyName : ruleDetails.propertyName,
+						relationshipPath : ruleDetails.relationshipPath
+					}
 				},
-				propertyKey : {
-					propertyName : ruleDetails.propertyName,
-					relationshipPath : ruleDetails.relationshipPath
-				}
-			},
-		};
-
-		await ClashReviewApi.updateSuppressionRule(iTwinId, ruleDetails.id, requestBody);
+			};
+	
+			await ClashReviewApi.updateSuppressionRule(iTwinId, ruleDetails.id, requestBody);
+			
+			alert("Suppression rule updated successfully")
+		} catch (error) {
+			console.log(error)
+			alert("Something went wrong!")
+		}
 	};
 
 	const addSuppressionRule = async () => {
-		const requestBody = {
-			templateId: selectedRuleTemplate.id,
-			name: ruleDetails.name,
-			reason: ruleDetails.reason,
-			parameters: {
-				operator: {
-					value : ruleDetails.operator
+		try {
+			const requestBody = {
+				templateId: selectedRuleTemplate.id,
+				name: ruleDetails.name,
+				reason: ruleDetails.reason,
+				parameters: {
+					operator: {
+						value : ruleDetails.operator
+					},
+					propertyKey : {
+						propertyName : ruleDetails.propertyName,
+						relationshipPath : ruleDetails.relationshipPath
+					}
 				},
-				propertyKey : {
-					propertyName : ruleDetails.propertyName,
-					relationshipPath : ruleDetails.relationshipPath
-				}
-			},
-		};
-
-		const response = await ClashReviewApi.createSuppressionRule(iTwinId, requestBody);
-		console.log(response);
+			};
+	
+			await ClashReviewApi.createSuppressionRule(iTwinId, requestBody);
+			alert("Suppression rule created successfully")
+		} catch (error) {
+			console.log(error)
+			alert("Something went wrong!")
+		} 
 	};
 
 	useEffect(() => {

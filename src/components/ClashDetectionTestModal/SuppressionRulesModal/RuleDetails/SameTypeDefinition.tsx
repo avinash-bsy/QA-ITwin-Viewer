@@ -47,15 +47,20 @@ const SameTypeDefinition: FunctionComponent<SameTypeDefinition> = ({ruleData}) =
 	};
 
 	const addSuppressionRule = async () => {
-		const requestBody = {
-			templateId: selectedRuleTemplate.id,
-			name: ruleDetails.name,
-			reason: ruleDetails.reason,
-			parameters: {},
-		};
-
-		const response = await ClashReviewApi.createSuppressionRule(iTwinId, requestBody);
-		console.log(response);
+		try {
+			const requestBody = {
+				templateId: selectedRuleTemplate.id,
+				name: ruleDetails.name,
+				reason: ruleDetails.reason,
+				parameters: {},
+			};
+	
+			await ClashReviewApi.createSuppressionRule(iTwinId, requestBody);
+			alert("Suppression rule created successfully")
+		} catch (error) {
+			console.log(error)
+			alert("Something went wrong!")
+		}
 	};
 
 	useEffect(() => {

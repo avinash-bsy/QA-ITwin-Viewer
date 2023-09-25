@@ -74,18 +74,25 @@ const MappingAndGroupingRule: FunctionComponent<MappingAndGroupingRuleProps> = (
 	}
 
 	const updateSuppressionRule = async () => {
-		const requestBody = {
-			name: ruleDetails.name,
-			reason: ruleDetails.reason,
-			parameters: {
-				queries: {
-					type: 1,
-					queryReference: `${ruleDetails.mappingId}:[${ruleDetails.groupingIds?.map((id: string) => id)}]`,
+		try {
+			const requestBody = {
+				name: ruleDetails.name,
+				reason: ruleDetails.reason,
+				parameters: {
+					queries: {
+						type: 1,
+						queryReference: `${ruleDetails.mappingId}:[${ruleDetails.groupingIds?.map((id: string) => id)}]`,
+					},
 				},
-			},
-		};
-
-		await ClashReviewApi.updateSuppressionRule(iTwinId, ruleDetails.id, requestBody);
+			};
+	
+			await ClashReviewApi.updateSuppressionRule(iTwinId, ruleDetails.id, requestBody);
+			alert("Suppression rule updated successfully")
+		} catch (error) {
+			console.log(error)
+			alert("Something went wrong!")
+		}
+		
 	};
 
 	const addSuppressionRule = async () => {
@@ -118,6 +125,7 @@ const MappingAndGroupingRule: FunctionComponent<MappingAndGroupingRuleProps> = (
 
 			if(method === "update")
 			{
+				debugger
 				const parameters = JSON.parse(ruleData.parameters);
 				const mappingAndGroupingData = convertStringtoObject(parameters?.queries?.queryReference);
 				const mappingId = Object.keys(mappingAndGroupingData)[0];
@@ -134,12 +142,14 @@ const MappingAndGroupingRule: FunctionComponent<MappingAndGroupingRuleProps> = (
 					ruleDetails.mappingId = mappingId
 				}
 
-				ruleData.groupingIds = Object.values(mappingAndGroupingData)[0] ?? [];
-				if (ruleData.mappingId) {
-					handleMappingSelection(ruleData.mappingId);
+				ruleDetails.groupingIds = Object.values(mappingAndGroupingData)[0] ?? [];
+				if (ruleDetails.mappingId) {
+					handleMappingSelection(ruleDetails.mappingId);
 				}
 
-				setRuleDetails(ruleData);
+				ruleDetails.name = ruleData.name
+				ruleDetails.reason = ruleData.reason
+				setRuleDetails(ruleDetails);
 			}
 		};
 
