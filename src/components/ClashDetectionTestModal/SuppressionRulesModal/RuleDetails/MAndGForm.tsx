@@ -125,7 +125,6 @@ const MappingAndGroupingRule: FunctionComponent<MappingAndGroupingRuleProps> = (
 
 			if(method === "update")
 			{
-				debugger
 				const parameters = JSON.parse(ruleData.parameters);
 				const mappingAndGroupingData = convertStringtoObject(parameters?.queries?.queryReference);
 				const mappingId = Object.keys(mappingAndGroupingData)[0];
@@ -147,9 +146,7 @@ const MappingAndGroupingRule: FunctionComponent<MappingAndGroupingRuleProps> = (
 					handleMappingSelection(ruleDetails.mappingId);
 				}
 
-				ruleDetails.name = ruleData.name
-				ruleDetails.reason = ruleData.reason
-				setRuleDetails(ruleDetails);
+				setRuleDetails({...ruleData, ...ruleDetails});
 			}
 		};
 
