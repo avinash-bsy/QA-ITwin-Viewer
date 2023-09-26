@@ -386,7 +386,7 @@ export default class ClashReviewApi extends HelperMethods {
 
 	public static async getSuppressionRules(projectId: string) {
 		const response = await ClashReviewApi.getAllSuppressionRules(projectId, "")
-		const filteredRows = response.rows.filter((row: any) => ["1d9e0843-94bd-44fe-b357-0a2accef1717", "cc9ebab1-c684-4500-b588-73445d09391b", "e4176170-583f-4d27-997e-2149d16a87d0", "95d3e23f-e175-4979-b128-fff03fa231e3"].includes(row.templateId));
+		const filteredRows = response.rows.filter((row: any) => ["1d9e0843-94bd-44fe-b357-0a2accef1717", "cc9ebab1-c684-4500-b588-73445d09391b", "e4176170-583f-4d27-997e-2149d16a87d0", "95d3e23f-e175-4979-b128-fff03fa231e3", "9fdd506e-0bdc-4ffd-999a-2ce4d8b4f9d7", "ce02cc01-7ebc-4626-a8a6-ae99e45edcd5", "12e8740a-8657-482e-97bb-d0ff6d35dc42"].includes(row.templateId));
 
 		return filteredRows;
 	}

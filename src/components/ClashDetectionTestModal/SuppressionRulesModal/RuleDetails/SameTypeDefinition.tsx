@@ -40,7 +40,7 @@ const SameTypeDefinition: FunctionComponent<SameTypeDefinition> = ({ruleData}) =
 		const requestBody = {
 			name: ruleDetails.name,
 			reason: ruleDetails.reason,
-			parameters: {},
+			// parameters: {},
 		};
 
 		await ClashReviewApi.updateSuppressionRule(iTwinId, ruleDetails.id, requestBody);
@@ -52,7 +52,7 @@ const SameTypeDefinition: FunctionComponent<SameTypeDefinition> = ({ruleData}) =
 				templateId: selectedRuleTemplate.id,
 				name: ruleDetails.name,
 				reason: ruleDetails.reason,
-				parameters: {},
+				// parameters: {},
 			};
 	
 			await ClashReviewApi.createSuppressionRule(iTwinId, requestBody);
@@ -66,11 +66,6 @@ const SameTypeDefinition: FunctionComponent<SameTypeDefinition> = ({ruleData}) =
 	useEffect(() => {
 		if(method === "update")
 		{
-			// const parameters = JSON.parse(ruleData.parameters)
-			// let structuredRuleData = {
-			// 	...ruleData
-			// }
-	
 			setRuleDetails(ruleData)
 		}
 	}, [])
