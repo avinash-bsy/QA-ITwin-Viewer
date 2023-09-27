@@ -109,7 +109,7 @@ const MappingAndGroupingRule: FunctionComponent<MappingAndGroupingRuleProps> = (
 		};
 
 		const response = await ClashReviewApi.createSuppressionRule(iTwinId, requestBody);
-		console.log(response);
+		alert("Suppression rule created successfully")
 	};
 
 	useEffect(() => {
