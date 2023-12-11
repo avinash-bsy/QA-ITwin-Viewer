@@ -36,13 +36,14 @@ if (redirectUrl.pathname === window.location.pathname) {
 	BrowserAuthorizationClient.handleSignInCallback().catch(console.error);
 } else {
 	ReactDOM.render(
-		<React.StrictMode>
-			<ClashContextProvider>
-				<ThemeProvider theme={"os"}>
-					<App />
-				</ThemeProvider>
-			</ClashContextProvider>
-		</React.StrictMode>,
+		// <React.StrictMode>
+		// 	<ClashContextProvider>
+		// 		<ThemeProvider theme={"os"}>
+		// 			<App />
+		// 		</ThemeProvider>
+		// 	</ClashContextProvider>
+		// </React.StrictMode>,
+		<></>,
 		document.getElementById("root")
 	);
 }
